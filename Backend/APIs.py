@@ -10,6 +10,7 @@ from sql import create_connection
 from sql import execute_read_query
 from sql import execute_query
 import creds
+from mysql.connector import Error
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -112,3 +113,81 @@ app.run()
 #     conn.commit()
 #
 #     return 'Snowboard added successfully'
+
+
+# Becky's portion of captain table & log in API 
+@app.route('api/captain', method = ["GET"])
+def get_captain_record():
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+    if 'secondary_id' in request.args: # only if an secondary_id is provided as an argument, proceed
+        # Gets the info from the arguments
+        secondary_id = int(request.args['secondary_id'])
+    else:
+        return 'ERROR: No ID provided!'
+
+    sql = "SELECT * FROM captain"
+    captain = execute_read_query(conn, sql) # Collects all records from the DB table and makes a list of dictionaries
+    captain_record = [] # Empty string to put the record in
+
+    for item in captain: # Loop through the list of dictionaries
+        if item['secondary_id'] == secondary_id: # Find the one with the matching ID
+            captain_record.append(item) # Add the result to list
+    return jsonify(captain_record)
+
+@app.route('api/captain', method = ["POST"])
+def new_captain_record():
+    try:
+        # requesting new data to put in database
+        request_data = request.get_json()
+        secondary_id = request_data['secondary_id']
+        firstname = request_data['firstname']
+        lastname = request_data['lastname']
+        rank = request_data['rank']
+        homeplanet = request_data['homeplanet']
+        # Set up a connection the DB
+        myCreds = creds.Creds()
+        conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+        # SQL query to add a new captain information to the database
+        sql = "INSERT INTO captain (secondary_id, firstname, lastname, rank, homeplanet) VALUES (%s, '%s', '%s', '%s', '%s')" % (int(secondary_id), firstname, lastname, rank, homeplanet)
+        execute_read_query(conn, sql)
+        conn.commit()
+        return 'New captain added successfully' # Success message
+
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+    
+
+@app.route('api/captain', method = ["PUT"])
+def update_captain_record():
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)   
+    request_data = request.get_json() 
+    newFirstName = request_data['firstname']
+    newLastName = request_data['lastname']
+    newRank = request_data['rank']
+    newHomePlanet = request_data['homeplanet']
+    inputID = request_data['secondary_id']
+
+    # if the user wants to update one row in the 'captain' table, he/she will need to input values for all 4 variables (first name, last name, rank, home planet)
+    # The row is identified by the id number
+    sqlQuery = "UPDATE captain SET firstname='%s', lastname='%s', rank='%s', homeplanet='%s' WHERE secondary_id ='%s' " % (newFirstName, newLastName, newRank, newHomePlanet, inputID)
+    execute_query(conn, sqlQuery)
+    return 'Update entire row is successful!'
+
+@app.route('api/captain', method = ["DELETE"])
+def delete_captain_record():
+    # establishes connection to database
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+    sql = "SELECT * FROM captain"
+    captain = execute_read_query(conn, sql) # reads the captain table 
+    idToDelete = int(request.args['secondaryid'])
+    for i in range(len(captain) -1, -1, -1):
+        if captain[i]['secondaryid'] == idToDelete:
+            sqlDeleteQuery = "DELETE FROM captain WHERE id= %s"%(idToDelete) # creates a SQL query to delete the row with ID identified
+            execute_query(conn, sqlDeleteQuery) # executes the query
+    
+    return 'Delete request successful'
+
