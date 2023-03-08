@@ -106,18 +106,25 @@ def update_cargo():
     # set up a connection to the db
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+    shipid = None
 
     # Get the json data
     request_data = request.get_json()
     if 'secondary_id' in request_data:  # only if an id is provided in the json data will it proceed
         secondary_id = int(request_data['secondary_id'])
+
     else:
         return 'ERROR: No ID provided!'
 
     # So long as an ID is provided, this will go through each possible record and update only the fields that were
     # provided in the json data
-    if 'shipid' in request_data:
-        updated_shipid = request_data['shipid']
+    if 'secondary_ship_id' in request_data: # This will use the secondary_id given to find the actual id of the ship
+        secondary_ship_id = request_data['secondary_ship_id']
+        sql = "SELECT id FROM spaceship WHERE secondary_id = %s" % (secondary_ship_id)
+        updated_shipid = execute_read_query(conn, sql)
+        updated_shipid = updated_shipid[0]['id']
+
+
 
         sql = "SELECT * FROM spaceship"
         spaceship = execute_read_query(conn, sql)  # Collects all records from the DB table and makes a list of dictionaries
