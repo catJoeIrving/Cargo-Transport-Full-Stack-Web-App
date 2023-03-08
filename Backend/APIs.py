@@ -3,6 +3,13 @@
 # Username: admin
 # PW: 32Graduating!!
 
+# Joseph Irving & Becky Tseng
+#
+# Joseph Irving Tasks:
+#   Created tables / Cargo APIs / Spaceship APIs
+# Becky Tseng Tasks:
+#   Captain APIs / Login APIs
+
 import flask
 from flask import jsonify
 from flask import request
@@ -15,6 +22,8 @@ from mysql.connector import Error
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
+### Cargo Table APIs
+### Worked on by: Joseph Irving
 # http://127.0.0.1:5000/api/cargo
 @app.route('/api/cargo', methods=['GET']) #API to get a cargo record from the DB table
 def api_cargo_record():
@@ -42,7 +51,7 @@ def add_cargo():
     # Set up a connection the DB
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
-
+    # FIXME: Make sure the spaceship being selected exists, and departure and arrival are left blank when creating a new cargo record, they are only adding in updates
     # Get the json data and assign it to the proper variables
     request_data = request.get_json() # gets the info from the JSON package
     secondary_id = request_data['secondary_id']
@@ -56,7 +65,7 @@ def add_cargo():
     if 'arrival' in request_data:
         arrival = request_data['arrival']
 
-    # Logic for getting the a ships current weight and max weight:
+    # Logic for getting a ships current weight and max weight:
     current_ship_weight = []
     sql = "SELECT * FROM cargo"
     cargo = execute_read_query(conn, sql)
@@ -85,15 +94,96 @@ def add_cargo():
         else: # neither were given
             sql = "INSERT INTO cargo (secondary_id, weight, cargotype, shipid) VALUES (%s, '%s', '%s', %s)" % (int(secondary_id), weight, cargotype, int(shipid))
 
-        # FIXME: Duplicate secondary_id will return success string but encounter 'duplicate entry error' and not execute,
-        #  may not be an issue but depends on what professor says
+
         execute_read_query(conn, sql)
         conn.commit()
 
     return 'Cargo added successfully'
 
+# http://127.0.0.1:5000/api/cargo
+@app.route('/api/cargo', methods=['PUT'])
+def update_cargo():
+    # set up a connection to the db
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
 
-app.run()
+    # Get the json data
+    request_data = request.get_json()
+    if 'secondary_id' in request_data:  # only if an id is provided in the json data will it proceed
+        secondary_id = int(request_data['secondary_id'])
+    else:
+        return 'ERROR: No ID provided!'
+
+    # So long as an ID is provided, this will go through each possible record and update only the fields that were
+    # provided in the json data
+    if 'shipid' in request_data:
+        updated_shipid = request_data['shipid']
+
+        sql = "SELECT * FROM spaceship"
+        spaceship = execute_read_query(conn, sql)  # Collects all records from the DB table and makes a list of dictionaries
+        ship_exists = False
+        has_space = False
+        weight = None
+
+        # The weight of the cargo will either be the updated weight if given, or it's current weight
+        if 'weight' in request_data:
+            weight = request_data['weight']
+        else:
+            sql = "SELECT * FROM cargo"
+            cargo = execute_read_query(conn, sql)  # Collects all records from the DB table and makes a list of dictionaries
+            for record in cargo:
+                if record['secondary_id'] == secondary_id:
+                    weight = record['weight']
+
+        for ship in spaceship:  # Loop through ships to make sure the selected ship exists
+            if ship['id'] == updated_shipid:  # Find the one with the matching ID
+                ship_exists = True
+                break
+        else:
+            return 'Selected ship does not exist'
+        # Logic for getting a ships current weight and max weight:
+        current_ship_weight = []
+        sql = "SELECT * FROM cargo"
+        cargo = execute_read_query(conn, sql)
+        for item in cargo:  # Loop through the list of dictionaries
+            if item['shipid'] == updated_shipid:
+                current_ship_weight.append(int(item['weight']))
+        current_ship_weight = sum(current_ship_weight)
+        sql = "SELECT maxweight FROM spaceship WHERE id = %s" % (updated_shipid)
+        max_ship_weight = execute_read_query(conn, sql)
+        max_ship_weight = int(max_ship_weight[0]['maxweight'])
+
+        if int(current_ship_weight) + int(weight) > max_ship_weight:  # checks to see if there is space on the ship to
+            # receive the weight of the new cargo
+            return 'Not enough capacity on selected ship'
+        else:
+            has_space = True
+
+        if ship_exists and has_space: # If both are true, proceed with updating the record
+            sql = "UPDATE cargo SET shipid = %s WHERE secondary_id = %s" % (int(updated_shipid), secondary_id)
+            execute_read_query(conn, sql)
+
+    # Go through to check for the rest of the attributes and update only the ones provided
+    if 'weight' in request_data:
+        updated_weight = request_data['weight']
+        sql = "UPDATE cargo SET weight = %s WHERE secondary_id = %s" % (updated_weight, secondary_id)
+        execute_read_query(conn, sql)
+    if 'cargotype' in request_data:
+        cargotype = request_data['cargotype']
+        sql = "UPDATE cargo SET cargotype = '%s' WHERE secondary_id = %s" % (cargotype, secondary_id)
+        execute_read_query(conn, sql)
+    if 'departure' in request_data:
+        updated_departure = request_data['departure']
+        sql = "UPDATE cargo SET departure = '%s' WHERE secondary_id = %s" % (updated_departure, secondary_id)
+        execute_read_query(conn, sql)
+    if 'arrival' in request_data:
+        updated_arrival = request_data['arrival']
+        sql = "UPDATE cargo SET arrival = '%s' WHERE secondary_id = %s" % (updated_arrival, secondary_id)
+        execute_read_query(conn, sql)
+
+    conn.commit() # commits any changes from the above commands
+
+    return 'Cargo updated successfully'
 
 
 # Started working on this on accident, but this is basically a completed POST API for the captain table if you wanna
@@ -116,11 +206,11 @@ app.run()
 
 
 # Becky's portion of captain table & log in API 
-@app.route('api/captain', method = ["GET"])
+@app.route('/api/captain', methods=["GET"])
 def get_captain_record():
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
-    if 'secondary_id' in request.args: # only if an secondary_id is provided as an argument, proceed
+    if 'secondary_id' in request.args: # only if a secondary_id is provided as an argument, proceed
         # Gets the info from the arguments
         secondary_id = int(request.args['secondary_id'])
     else:
@@ -135,7 +225,7 @@ def get_captain_record():
             captain_record.append(item) # Add the result to list
     return jsonify(captain_record)
 
-@app.route('api/captain', method = ["POST"])
+@app.route('/api/captain', methods=["POST"])
 def new_captain_record():
     try:
         # requesting new data to put in database
@@ -159,7 +249,7 @@ def new_captain_record():
 
     
 
-@app.route('api/captain', method = ["PUT"])
+@app.route('/api/captain', methods=["PUT"])
 def update_captain_record():
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)   
@@ -176,7 +266,7 @@ def update_captain_record():
     execute_query(conn, sqlQuery)
     return 'Update entire row is successful!'
 
-@app.route('api/captain', method = ["DELETE"])
+@app.route('/api/captain', methods=["DELETE"])
 def delete_captain_record():
     # establishes connection to database
     myCreds = creds.Creds()
@@ -191,3 +281,4 @@ def delete_captain_record():
     
     return 'Delete request successful'
 
+app.run()
