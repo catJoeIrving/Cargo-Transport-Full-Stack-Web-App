@@ -257,6 +257,35 @@ def api_all_spaceship():
 
     return jsonify(results)
 
+# http://127.0.0.1:5000/api/spaceship
+@app.route('/api/spaceship', methods=['GET']) #API to get a record from the spaceship table
+def api_spaceship_record():
+    if 'secondary_id' in request.args: # only if a secondary_id is provided as an argument, proceed
+        # Gets the info from the arguments
+        secondary_id = int(request.args['secondary_id'])
+    else:
+        return 'ERROR: No ID provided!'
+
+    # Set up a connection to the DB
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+    sql = "SELECT * FROM spaceship"
+    spaceship = execute_read_query(conn, sql) # Collects all records from the DB table and makes a list of dictionaries
+    results = [] # Empty list to put the record in
+
+    for item in spaceship: # Loop through the list of dictionaries
+        if item['secondary_id'] == secondary_id: # Find the one with the matching ID
+            # Swaps captainid with the secondary_id from the captain table:
+            sql = "SELECT secondary_id FROM captain WHERE id = %s" % (item['captainid'])
+            captainid = execute_read_query(conn, sql)
+            item['captainid'] = captainid[0]['secondary_id']
+
+            del item['id']
+
+            results.append(item) # Add the result to list
+
+    return jsonify(results)
+
 
 # ============================================
 # Captain Table APIs
