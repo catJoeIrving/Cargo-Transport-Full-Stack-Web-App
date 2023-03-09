@@ -287,6 +287,35 @@ def api_spaceship_record():
     return jsonify(results)
 
 
+@app.route('/api/spaceship', methods=['POST'])  # API to add new spaceship to the spaceship table
+def add_spaceship():
+    # Set up a connection the DB
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+
+    request_data = request.get_json()  # gets the info from the JSON package
+
+    # Check if all 3 fields were provided, otherwise return an error message
+    if 'secondary_id' not in request_data or 'maxweight' not in request_data or 'captainid' not in request_data:
+        return 'ERROR: All fields (secondary_id, maxweight, captainid) are required to add a new spaceship!'
+
+    # Assign JSON data to the proper variables
+    secondary_id = request_data['secondary_id']
+    maxweight = request_data['maxweight']
+    captainid = request_data['captainid'] # this is actually the secondary_id for captain
+
+    # Get the actual captain ID using the secondary_id
+    sql = "SELECT id FROM captain WHERE secondary_id = '%s'" % captainid
+    captain_result = execute_read_query(conn, sql)
+    captain_id = captain_result[0]['id']
+
+    # Insert the new spaceship into the table
+    sql = "INSERT INTO spaceship (secondary_id, maxweight, captainid) VALUES ('%s', %s, %s)" % (secondary_id, maxweight, captain_id)
+    execute_read_query(conn, sql)
+    conn.commit()
+
+    return 'Spaceship added successfully'
+
 # ============================================
 # Captain Table APIs
 # ============================================
@@ -376,3 +405,6 @@ def delete_captain_record():
 
 
 app.run()
+
+
+################################
