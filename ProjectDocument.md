@@ -1,5 +1,5 @@
 #       Team Members
-# ===========================
+# ======================
 # Joseph Irving & Becky Tseng
 #
 #
