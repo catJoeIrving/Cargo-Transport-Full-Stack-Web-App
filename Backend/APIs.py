@@ -7,14 +7,14 @@
 # PW: 32Graduating!!
 
 # ============================================
-# Developers
+# Team Members
 # ============================================
 # Joseph Irving & Becky Tseng
 #
 # Joseph Irving Tasks:
-#   - Created tables / Cargo APIs / Spaceship APIs
+#   - Created DB tables / Cargo APIs / Spaceship APIs
 # Becky Tseng Tasks:
-#   - Captain APIs / Login APIs
+#   - Captain APIs / Login API
 
 import flask
 from flask import jsonify
@@ -32,6 +32,29 @@ app.config["DEBUG"] = True
 # Cargo Table APIs
 # ============================================
 # Worked on by: Joseph Irving
+
+# http://127.0.0.1:5000/api/cargo/all
+@app.route('/api/cargo/all', methods=['GET']) #API to get all records from the cargo table
+def api_all_cargo():
+    # Set up a connection to the DB
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+    sql = "SELECT * FROM cargo"
+    cargo = execute_read_query(conn, sql) # Collects all records from the DB table and makes a list of dictionaries
+    results = [] # Empty list to put the records in
+
+    for item in cargo: # Loop through the list of dictionaries
+        # Swaps shipid with the secondary_id from the spaceship table:
+        sql = "SELECT secondary_id FROM spaceship WHERE id = %s" % (item['shipid'])
+        shipid = execute_read_query(conn, sql)
+        item['shipid'] = shipid[0]['secondary_id']
+
+        del item['id']
+
+        results.append(item) # Add the result to list
+
+    return jsonify(results)
+
 
 # http://127.0.0.1:5000/api/cargo
 @app.route('/api/cargo', methods=['GET']) #API to get a record from the cargo table
