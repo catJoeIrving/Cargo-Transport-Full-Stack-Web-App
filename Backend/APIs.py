@@ -137,7 +137,6 @@ def update_cargo():
     request_data = request.get_json()
     if 'secondary_id' in request_data:  # only if an id is provided in the json data will it proceed
         secondary_id = int(request_data['secondary_id'])
-
     else:
         return 'ERROR: No ID provided!'
 
@@ -316,6 +315,56 @@ def add_spaceship():
 
     return 'Spaceship added successfully'
 
+# FIXME: Not sure whether you should be able to update secondary id, ask professor. Also, do we need to check current weight before updating maxweight?
+@app.route('/api/spaceship', methods=['PUT']) #API to update spaceship record
+def update_spaceship():
+    # Set up a connection to the DB
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+
+    # Get the json data and assign it to the proper variables
+    request_data = request.get_json()
+    if 'secondary_id' in request_data: # only if a secondary_id is provided in the json data will it proceed
+        secondary_id = int(request_data['secondary_id'])
+    else:
+        return 'ERROR: No ID provided!'
+
+    # Check if the captain_id is provided in the json data, and then get the actual captain_id from the captain table
+    if 'captainid' in request_data:
+        captain_secondary_id = request_data['captainid']
+        sql = "SELECT id FROM captain WHERE secondary_id = %s" % (captain_secondary_id)
+        captain_id = execute_read_query(conn, sql)
+        captain_id = captain_id[0]['id']
+
+    # Go through to check for the rest of the attributes and update only the ones provided
+    if 'maxweight' in request_data:
+        updated_maxweight = request_data['maxweight']
+        sql = "UPDATE spaceship SET maxweight = %s WHERE secondary_id = %s" % (updated_maxweight, secondary_id)
+        execute_read_query(conn, sql)
+    if 'captainid' in request_data:
+        sql = "UPDATE spaceship SET captainid = %s WHERE secondary_id = %s" % (captain_id, secondary_id)
+        execute_read_query(conn, sql)
+
+    conn.commit() # commits any changes from the above commands
+
+    return 'Spaceship updated successfully'
+
+@app.route('/api/spaceship', methods=['DELETE']) #API to delete a record from the spaceship table
+def delete_spaceship():
+    # Set up a connection
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+
+    # Get the json data, assign the id, execute the sql to delete the record with the matching id
+    request_data = request.get_json()
+    delete_spaceship = request_data['secondary_id']
+    delete_sql = "DELETE FROM spaceship WHERE secondary_id = %s" % (delete_spaceship)
+    execute_read_query(conn, delete_sql)
+    conn.commit()
+
+    return "Spaceship successfully deleted"
+
+
 # ============================================
 # Captain Table APIs
 # ============================================
@@ -408,3 +457,4 @@ app.run()
 
 
 ################################
+
