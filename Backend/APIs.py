@@ -90,7 +90,7 @@ def add_cargo():
     # Set up a connection the DB
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
-    # FIXME: May need to make sure the spaceship being selected exists, checking with professor
+
     # Get the json data and assign it to the proper variables
     request_data = request.get_json() # gets the info from the JSON package
     secondary_id = request_data['secondary_id']
@@ -101,7 +101,6 @@ def add_cargo():
     sql = "SELECT id FROM spaceship WHERE secondary_id = %s" % (secondary_ship_id)
     shipid = execute_read_query(conn, sql)
     shipid = shipid[0]['id']
-
 
     # Logic for getting a ships current weight and max weight:
     current_ship_weight = []
@@ -236,7 +235,27 @@ def delete_cargo():
 # Spaceship Table APIs
 # ============================================
 # Worked on by: Joseph Irving
-# FIXME: To be completed
+
+@app.route('/api/spaceship/all', methods=['GET']) #API to get all records from the spaceship table
+def api_all_spaceship():
+    # Set up a connection to the DB
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+    sql = "SELECT * FROM spaceship"
+    spaceships = execute_read_query(conn, sql) # Collects all records from the DB table and makes a list of dictionaries
+    results = [] # Empty list to put the records in
+
+    for item in spaceships:  # Loop through the list of dictionaries
+        # Swaps captainid with the secondary_id from the captain table:
+        sql = "SELECT secondary_id FROM captain WHERE id = %s" % (item['captainid'])
+        captainid = execute_read_query(conn, sql)
+        item['captainid'] = captainid[0]['secondary_id']
+
+        del item['id']
+
+        results.append(item)  # Add the result to list
+
+    return jsonify(results)
 
 
 # ============================================
