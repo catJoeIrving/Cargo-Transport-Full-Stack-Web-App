@@ -42,6 +42,13 @@ def api_cargo_record():
 
     for item in cargo: # Loop through the list of dictionaries
         if item['secondary_id'] == secondary_id: # Find the one with the matching ID
+
+            sql = "SELECT secondary_id FROM spaceship WHERE id = %s" % (item['shipid'])
+            shipid = execute_read_query(conn, sql)
+            item['shipid'] = shipid[0]['secondary_id']
+
+            del item['id']
+
             results.append(item) # Add the result to list
     return jsonify(results)
 
@@ -51,19 +58,18 @@ def add_cargo():
     # Set up a connection the DB
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
-    # FIXME: Make sure the spaceship being selected exists, and departure and arrival are left blank when creating a new cargo record, they are only adding in updates
+    # FIXME: May need to make sure the spaceship being selected exists, checking with professor
     # Get the json data and assign it to the proper variables
     request_data = request.get_json() # gets the info from the JSON package
     secondary_id = request_data['secondary_id']
     weight = request_data['weight']
     cargotype = request_data['cargotype']
-    departure = None
-    arrival = None
-    shipid = request_data['shipid']
-    if 'departure' in request_data:
-        departure = request_data['departure']
-    if 'arrival' in request_data:
-        arrival = request_data['arrival']
+
+    secondary_ship_id = request_data['secondary_ship_id'] # gets the actual ship ID using the secondary ID
+    sql = "SELECT id FROM spaceship WHERE secondary_id = %s" % (secondary_ship_id)
+    shipid = execute_read_query(conn, sql)
+    shipid = shipid[0]['id']
+
 
     # Logic for getting a ships current weight and max weight:
     current_ship_weight = []
@@ -81,19 +87,7 @@ def add_cargo():
         # receive the weight of the new cargo
         return 'Not enough capacity on selected ship'
     else:
-        # Execute the SQL syntax to create a new record using the variables provided
-        if departure and arrival: # SQL script for if departure and arrival were given
-            sql = "INSERT INTO cargo (secondary_id, weight, cargotype, departure, arrival, shipid) VALUES (%s, '%s', '%s', '%s', '%s', %s)" % (
-            int(secondary_id), weight, cargotype, departure, arrival, int(shipid))
-        elif departure and not arrival: # SQL script for if departure was given but not arrival
-            sql = "INSERT INTO cargo (secondary_id, weight, cargotype, departure, shipid) VALUES (%s, '%s', '%s', '%s', %s)" % (
-            int(secondary_id), weight, cargotype, departure, int(shipid))
-        elif arrival and not departure: # SQL script for if arrival was given but not departure
-            sql = "INSERT INTO cargo (secondary_id, weight, cargotype, arrival, shipid) VALUES (%s, '%s', '%s', '%s', %s)" % (
-            int(secondary_id), weight, cargotype, arrival, int(shipid))
-        else: # neither were given
-            sql = "INSERT INTO cargo (secondary_id, weight, cargotype, shipid) VALUES (%s, '%s', '%s', %s)" % (int(secondary_id), weight, cargotype, int(shipid))
-
+        sql = "INSERT INTO cargo (secondary_id, weight, cargotype, shipid) VALUES (%s, '%s', '%s', %s)" % (int(secondary_id), weight, cargotype, int(shipid))
 
         execute_read_query(conn, sql)
         conn.commit()
