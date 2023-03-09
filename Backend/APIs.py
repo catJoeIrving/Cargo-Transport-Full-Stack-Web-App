@@ -1,14 +1,20 @@
+# ============================================
+# Database Information
+# ============================================
 # DB Identifier: cis3368spring
 # DB name: CIS3368SpringDB
 # Username: admin
 # PW: 32Graduating!!
 
+# ============================================
+# Developers
+# ============================================
 # Joseph Irving & Becky Tseng
 #
 # Joseph Irving Tasks:
-#   Created tables / Cargo APIs / Spaceship APIs
+#   - Created tables / Cargo APIs / Spaceship APIs
 # Becky Tseng Tasks:
-#   Captain APIs / Login APIs
+#   - Captain APIs / Login APIs
 
 import flask
 from flask import jsonify
@@ -22,10 +28,13 @@ from mysql.connector import Error
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-### Cargo Table APIs
-### Worked on by: Joseph Irving
+# ============================================
+# Cargo Table APIs
+# ============================================
+# Worked on by: Joseph Irving
+
 # http://127.0.0.1:5000/api/cargo
-@app.route('/api/cargo', methods=['GET']) #API to get a cargo record from the DB table
+@app.route('/api/cargo', methods=['GET']) #API to get a record from the cargo table
 def api_cargo_record():
     if 'secondary_id' in request.args: # only if an secondary_id is provided as an argument, proceed
         # Gets the info from the arguments
@@ -42,7 +51,7 @@ def api_cargo_record():
 
     for item in cargo: # Loop through the list of dictionaries
         if item['secondary_id'] == secondary_id: # Find the one with the matching ID
-
+            # Swaps shipid with the secondary_id from the spaceship table:
             sql = "SELECT secondary_id FROM spaceship WHERE id = %s" % (item['shipid'])
             shipid = execute_read_query(conn, sql)
             item['shipid'] = shipid[0]['secondary_id']
@@ -53,7 +62,7 @@ def api_cargo_record():
     return jsonify(results)
 
 # http://127.0.0.1:5000/api/cargo
-@app.route('/api/cargo', methods=['POST']) #API to add new cargo to the DB table so long as there is space
+@app.route('/api/cargo', methods=['POST']) #API to add new cargo to the cargo table so long as there is space
 def add_cargo():
     # Set up a connection the DB
     myCreds = creds.Creds()
@@ -118,10 +127,8 @@ def update_cargo():
         updated_shipid = execute_read_query(conn, sql)
         updated_shipid = updated_shipid[0]['id']
 
-
-
         sql = "SELECT * FROM spaceship"
-        spaceship = execute_read_query(conn, sql)  # Collects all records from the DB table and makes a list of dictionaries
+        spaceship = execute_read_query(conn, sql)  # Collects all records from the cargo table and makes a list of dictionaries
         ship_exists = False
         has_space = False
         weight = None
@@ -186,27 +193,34 @@ def update_cargo():
 
     return 'Cargo updated successfully'
 
+# http://127.0.0.1:5000/api/cargo
+@app.route('/api/cargo', methods=['DELETE']) # #API to delete a record from the cargo table
+def delete_cargo():
+    # Set up a connection
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
 
-# Started working on this on accident, but this is basically a completed POST API for the captain table if you wanna
-# use it, just change api/cargo path # http://127.0.0.1:5000/api/cargo @app.route('/api/cargo', methods=['POST'])
-#
-# #API to add new cargo to the DB table so long as there is space def add_cargo(): # Get the json data and assign it
-# to the proper variables request_data = request.get_json() # gets the info from the JSON package secondary_id =
-# request_data['secondary_id'] firstname = request_data['firstname'] lastname = request_data['lastname'] rank =
-# request_data['rank'] homeplanet = request_data['homeplanet']
-#
-#     # Set up a connection the DB
-#     myCreds = creds.Creds()
-#     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
-#     # Execut the SQL syntax to create a new record using the variables provided
-#     sql = "INSERT INTO snowboard (secondary_id, firstname, lastname, rank, homeplanet) VALUES (%s, '%s', '%s', '%s', '%s')" % (int(secondary_id), firstname, lastname, rank, homeplanet)
-#     execute_read_query(conn, sql)
-#     conn.commit()
-#
-#     return 'Snowboard added successfully'
+    # Get the json data, assign the id, execute the sql syntax to delete the record with the matching id
+    request_data = request.get_json()
+    delete_cargo = request_data['secondary_id']
+    delete_sql = "DELETE FROM cargo WHERE secondary_id = %s" % (delete_cargo)
+    execute_read_query(conn, delete_sql)
+    conn.commit()
+
+    return "Cargo successfully deleted"
+
+# ============================================
+# Spaceship Table APIs
+# ============================================
+# Worked on by: Joseph Irving
+# FIXME: To be completed
 
 
-# Becky's portion of captain table & log in API 
+# ============================================
+# Captain Table APIs
+# ============================================
+# Worked on by: Becky Tseng
+
 @app.route('/api/captain', methods=["GET"])
 def get_captain_record():
     myCreds = creds.Creds()
@@ -281,5 +295,13 @@ def delete_captain_record():
             execute_query(conn, sqlDeleteQuery) # executes the query
     
     return 'Delete request successful'
+
+# ============================================
+# Login API
+# ============================================
+# Worked on by: Becky Tseng
+# FIXME: To be completed
+
+
 
 app.run()
