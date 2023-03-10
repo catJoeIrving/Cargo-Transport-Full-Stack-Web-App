@@ -24,6 +24,8 @@ from sql import execute_read_query
 from sql import execute_query
 import creds
 from mysql.connector import Error
+import hashlib
+from flask import request, make_response
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -370,6 +372,25 @@ def delete_spaceship():
 # ============================================
 # Worked on by: Becky Tseng
 
+@app.route('/api/captain/all', methods=['GET']) #API to get all records from the captain table
+def api_all_captain():
+    # Set up a connection to the DB
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+    sql = "SELECT * FROM captain"
+    captains = execute_read_query(conn, sql) # Collects all records from the DB table and makes a list of dictionaries
+    results = [] # Empty list to put the records in
+
+    for item in captains:  # Loop through the list of dictionaries
+        # Swaps captainid with the secondary_id from the captain table:
+
+        del item['id']
+
+        results.append(item)  # Add the result to list
+
+    return jsonify(results)
+
+
 @app.route('/api/captain', methods=["GET"])
 def get_captain_record():
     myCreds = creds.Creds()
@@ -386,31 +407,30 @@ def get_captain_record():
 
     for item in captain: # Loop through the list of dictionaries
         if item['secondary_id'] == secondary_id: # Find the one with the matching ID
+            del item['id']
             captain_record.append(item) # Add the result to list
     return jsonify(captain_record)
 
 @app.route('/api/captain', methods=["POST"])
 def new_captain_record():
-    try:
-        # requesting new data to put in database
-        request_data = request.get_json()
-        secondary_id = request_data['secondary_id']
-        firstname = request_data['firstname']
-        lastname = request_data['lastname']
-        rank = request_data['rank']
-        homeplanet = request_data['homeplanet']
-        # Set up a connection the DB
-        myCreds = creds.Creds()
-        conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
-        # SQL query to add a new captain information to the database
-        sql = "INSERT INTO captain (secondary_id, firstname, lastname, rank, homeplanet) VALUES (%s, '%s', '%s', '%s', '%s')" % (int(secondary_id), firstname, lastname, rank, homeplanet)
-        execute_read_query(conn, sql)
-        conn.commit()
-        return 'New captain added successfully' # Success message
+    # requesting new data to put in database
+    request_data = request.get_json()
+    secondary_id = request_data['secondary_id']
+    firstname = request_data['firstname']
+    lastname = request_data['lastname']
+    rank = request_data['rank']
+    homeplanet = request_data['homeplanet']
+    # Set up a connection the DB
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
+    # SQL query to add a new captain information to the database
+    sql = "INSERT INTO captain (secondary_id, firstname, lastname, `rank`, homeplanet) VALUES ('%s', '%s', '%s', '%s', '%s')" % (secondary_id, firstname, lastname, rank, homeplanet)
+    execute_read_query(conn, sql)
+    conn.commit()
 
-    except Error as e:
-        print(f"The error '{e}' occurred")
+    return 'New captain added successfully' # Success message
 
+    
     
 
 @app.route('/api/captain', methods=["PUT"])
@@ -426,22 +446,23 @@ def update_captain_record():
 
     # if the user wants to update one row in the 'captain' table, he/she will need to input values for all 4 variables (first name, last name, rank, home planet)
     # The row is identified by the id number
-    sqlQuery = "UPDATE captain SET firstname='%s', lastname='%s', rank='%s', homeplanet='%s' WHERE secondary_id ='%s' " % (newFirstName, newLastName, newRank, newHomePlanet, inputID)
+    sqlQuery = "UPDATE captain SET firstname=%s, lastname=%s, `rank` =%s, homeplanet=%s WHERE secondary_id =%s " % (newFirstName, newLastName, newRank, newHomePlanet, inputID)
     execute_query(conn, sqlQuery)
+    conn.commit()
+    
     return 'Update entire row is successful!'
 
 @app.route('/api/captain', methods=["DELETE"])
 def delete_captain_record():
+
     # establishes connection to database
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
-    sql = "SELECT * FROM captain"
-    captain = execute_read_query(conn, sql) # reads the captain table 
-    idToDelete = int(request.args['secondaryid'])
-    for i in range(len(captain) -1, -1, -1):
-        if captain[i]['secondaryid'] == idToDelete:
-            sqlDeleteQuery = "DELETE FROM captain WHERE id= %s"%(idToDelete) # creates a SQL query to delete the row with ID identified
-            execute_query(conn, sqlDeleteQuery) # executes the query
+    request_data = request.get_json()
+    idToDelete = request_data['secondary_id'] 
+    sqlDeleteQuery = "DELETE FROM captain WHERE secondary_id = %s" % (idToDelete) # creates a SQL query to delete the row with ID identified
+    execute_query(conn, sqlDeleteQuery) # executes the query
+    conn.commit()
     
     return 'Delete request successful'
 
@@ -449,7 +470,20 @@ def delete_captain_record():
 # Login API
 # ============================================
 # Worked on by: Becky Tseng
-# FIXME: To be completed
+
+username = "admin"
+password = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+ValidToken = {"404"}
+
+
+@app.route('/api/login', methods=["GET"])
+def authenticate():
+    if request.authorization: 
+        encoded = request.authorization.password.encode()
+        hashedResult = hashlib.sha256(encoded)
+        if request.authorization.username == username and hashedResult.hexdigest() == password:
+            return '<h1> WELCOME </h1>'
+    return make_response('COULD NOT VERIFY!', 401, {'WWW-Authenticate': 'Basic realm="login required"'})
 
 
 
