@@ -65,7 +65,8 @@ def api_cargo_record():
         # Gets the info from the arguments
         secondary_id = int(request.args['secondary_id'])
     else:
-        return 'ERROR: No ID provided!'
+        no_id = 'ERROR: No ID provided!'
+        return jsonify(no_id)
 
     # Set up a connection to the DB
     myCreds = creds.Creds()
@@ -269,7 +270,8 @@ def api_spaceship_record():
         # Gets the info from the arguments
         secondary_id = int(request.args['secondary_id'])
     else:
-        return 'ERROR: No ID provided!'
+        no_id = 'ERROR: No ID provided!'
+        return jsonify(no_id)
 
     # Set up a connection to the DB
     myCreds = creds.Creds()
@@ -369,7 +371,7 @@ def delete_spaceship():
     execute_read_query(conn, delete_sql)
     conn.commit()
 
-    return True
+    return jsonify(True)
 
 
 # ============================================
@@ -421,6 +423,11 @@ def get_captain_record():
 def new_captain_record():
     # requesting new data to put in database
     request_data = request.get_json()
+
+    if 'secondary_id' not in request_data or 'firstname' not in request_data or 'lastname' not in request_data or 'rank' not in request_data or 'homeplanet' not in request_data:
+        missing = 'ERROR: All fields (secondary_id, firstname, lastname, rank, homeplanet) are required to add a new captain!'
+        return jsonify(missing)
+
     secondary_id = request_data['secondary_id']
     firstname = request_data['firstname']
     lastname = request_data['lastname']
@@ -446,6 +453,10 @@ def update_captain_record():
     newRank = request_data['rank']
     newHomePlanet = request_data['homeplanet']
     inputID = request_data['secondary_id']
+
+    if 'secondary_id' not in request_data or 'firstname' not in request_data or 'lastname' not in request_data or 'rank' not in request_data or 'homeplanet' not in request_data:
+        missing = 'ERROR: All fields (secondary_id, firstname, lastname, rank, homeplanet) are required to add a new captain!'
+        return jsonify(missing)
 
     # if the user wants to update one row in the 'captain' table, he/she will need to input values for all 4 variables (first name, last name, rank, home planet)
     # The row is identified by the id number
