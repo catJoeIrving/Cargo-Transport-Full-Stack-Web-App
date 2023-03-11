@@ -118,14 +118,15 @@ def add_cargo():
 
     if int(current_ship_weight) + int(weight) > max_ship_weight: # checks to see if there is space on the ship to
         # receive the weight of the new cargo
-        return 'Not enough capacity on selected ship'
+        full = 'Not enough capacity on selected ship'
+        return jsonify(full)
     else:
         sql = "INSERT INTO cargo (secondary_id, weight, cargotype, shipid) VALUES (%s, '%s', '%s', %s)" % (int(secondary_id), weight, cargotype, int(shipid))
 
         execute_read_query(conn, sql)
         conn.commit()
 
-    return 'Cargo added successfully'
+    return jsonify(True)
 
 # http://127.0.0.1:5000/api/cargo
 @app.route('/api/cargo', methods=['PUT'])
@@ -140,7 +141,8 @@ def update_cargo():
     if 'secondary_id' in request_data:  # only if an id is provided in the json data will it proceed
         secondary_id = int(request_data['secondary_id'])
     else:
-        return 'ERROR: No ID provided!'
+        no_id = 'ERROR: No ID provided!'
+        return jsonify(no_id)
 
     # So long as an ID is provided, this will go through each possible record and update only the fields that were
     # provided in the json data
@@ -171,7 +173,8 @@ def update_cargo():
                 ship_exists = True
                 break
         else:
-            return 'Selected ship does not exist'
+            no_ship = 'Selected ship does not exist'
+            return jsonify(no_ship)
         # Logic for getting a ships current weight and max weight:
         current_ship_weight = []
         sql = "SELECT * FROM cargo"
@@ -186,7 +189,8 @@ def update_cargo():
 
         if int(current_ship_weight) + int(weight) > max_ship_weight:  # checks to see if there is space on the ship to
             # receive the weight of the new cargo
-            return 'Not enough capacity on selected ship'
+            full = 'Not enough capacity on selected ship'
+            return jsonify(full)
         else:
             has_space = True
 
@@ -214,7 +218,7 @@ def update_cargo():
 
     conn.commit() # commits any changes from the above commands
 
-    return 'Cargo updated successfully'
+    return jsonify(True)
 
 # http://127.0.0.1:5000/api/cargo
 @app.route('/api/cargo', methods=['DELETE']) # #API to delete a record from the cargo table
@@ -230,7 +234,7 @@ def delete_cargo():
     execute_read_query(conn, delete_sql)
     conn.commit()
 
-    return "Cargo successfully deleted"
+    return jsonify(True)
 
 # ============================================
 # Spaceship Table APIs
@@ -298,7 +302,8 @@ def add_spaceship():
 
     # Check if all 3 fields were provided, otherwise return an error message
     if 'secondary_id' not in request_data or 'maxweight' not in request_data or 'captainid' not in request_data:
-        return 'ERROR: All fields (secondary_id, maxweight, captainid) are required to add a new spaceship!'
+        missing = 'ERROR: All fields (secondary_id, maxweight, captainid) are required to add a new spaceship!'
+        return jsonify(missing)
 
     # Assign JSON data to the proper variables
     secondary_id = request_data['secondary_id']
@@ -315,9 +320,8 @@ def add_spaceship():
     execute_read_query(conn, sql)
     conn.commit()
 
-    return 'Spaceship added successfully'
+    return jsonify(True)
 
-# FIXME: Not sure whether you should be able to update secondary id, ask professor. Also, do we need to check current weight before updating maxweight?
 @app.route('/api/spaceship', methods=['PUT']) #API to update spaceship record
 def update_spaceship():
     # Set up a connection to the DB
@@ -329,7 +333,8 @@ def update_spaceship():
     if 'secondary_id' in request_data: # only if a secondary_id is provided in the json data will it proceed
         secondary_id = int(request_data['secondary_id'])
     else:
-        return 'ERROR: No ID provided!'
+        no_id = 'ERROR: No ID provided!'
+        return jsonify(no_id)
 
     # Check if the captain_id is provided in the json data, and then get the actual captain_id from the captain table
     if 'captainid' in request_data:
@@ -349,7 +354,7 @@ def update_spaceship():
 
     conn.commit() # commits any changes from the above commands
 
-    return 'Spaceship updated successfully'
+    return jsonify(True)
 
 @app.route('/api/spaceship', methods=['DELETE']) #API to delete a record from the spaceship table
 def delete_spaceship():
@@ -364,7 +369,7 @@ def delete_spaceship():
     execute_read_query(conn, delete_sql)
     conn.commit()
 
-    return "Spaceship successfully deleted"
+    return True
 
 
 # ============================================
@@ -399,7 +404,8 @@ def get_captain_record():
         # Gets the info from the arguments
         secondary_id = int(request.args['secondary_id'])
     else:
-        return 'ERROR: No ID provided!'
+        no_id = 'ERROR: No ID provided!'
+        return jsonify(no_id)
 
     sql = "SELECT * FROM captain"
     captain = execute_read_query(conn, sql) # Collects all records from the DB table and makes a list of dictionaries
@@ -428,7 +434,7 @@ def new_captain_record():
     execute_read_query(conn, sql)
     conn.commit()
 
-    return 'New captain added successfully' # Success message
+    return jsonify(True) # Success
 
 @app.route('/api/captain', methods=['PUT'])
 def update_captain_record():
@@ -447,7 +453,7 @@ def update_captain_record():
     execute_query(conn, sqlQuery)
     conn.commit()
     
-    return 'Update entire row is successful!'
+    return jsonify(True)
 
 @app.route('/api/captain', methods=['DELETE'])
 def delete_captain_record():
@@ -461,7 +467,7 @@ def delete_captain_record():
     execute_query(conn, sqlDeleteQuery) # executes the query
     conn.commit()
     
-    return 'Delete request successful'
+    return jsonify(True)
 
 # ============================================
 # Login API
@@ -490,12 +496,10 @@ def authenticate():
     pw = request.headers['password']
     for au in authorized_users: #loop over all users and find one that is authorized to access
         if au['username'] == username and au['password'] == pw: #found an authorized user
-            return "You're authorized to see this but now we have to figure out what you want to do"
+            return jsonify(True)
         else:
-            return "The police are on their way" # Authentication failed message
+            return jsonify(False) # Authentication failed
 
 app.run()
 
-
 ################################
-
