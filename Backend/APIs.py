@@ -391,7 +391,7 @@ def api_all_captain():
     return jsonify(results)
 
 
-@app.route('/api/captain', methods=["GET"])
+@app.route('/api/captain', methods=['GET'])
 def get_captain_record():
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
@@ -411,7 +411,7 @@ def get_captain_record():
             captain_record.append(item) # Add the result to list
     return jsonify(captain_record)
 
-@app.route('/api/captain', methods=["POST"])
+@app.route('/api/captain', methods=['POST'])
 def new_captain_record():
     # requesting new data to put in database
     request_data = request.get_json()
@@ -430,7 +430,7 @@ def new_captain_record():
 
     return 'New captain added successfully' # Success message
 
-@app.route('/api/captain', methods=["PUT"])
+@app.route('/api/captain', methods=['PUT'])
 def update_captain_record():
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)   
@@ -443,20 +443,20 @@ def update_captain_record():
 
     # if the user wants to update one row in the 'captain' table, he/she will need to input values for all 4 variables (first name, last name, rank, home planet)
     # The row is identified by the id number
-    sqlQuery = "UPDATE captain SET firstname=%s, lastname=%s, `rank` =%s, homeplanet=%s WHERE secondary_id =%s " % (newFirstName, newLastName, newRank, newHomePlanet, inputID)
+    sqlQuery = "UPDATE captain SET firstname='%s', lastname='%s', `rank` ='%s', homeplanet='%s' WHERE secondary_id =%s " % (newFirstName, newLastName, newRank, newHomePlanet, inputID)
     execute_query(conn, sqlQuery)
     conn.commit()
     
     return 'Update entire row is successful!'
 
-@app.route('/api/captain', methods=["DELETE"])
+@app.route('/api/captain', methods=['DELETE'])
 def delete_captain_record():
 
     # establishes connection to database
-    myCreds = creds.Creds()
-    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
     request_data = request.get_json()
     idToDelete = request_data['secondary_id'] 
+    myCreds = creds.Creds()
+    conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
     sqlDeleteQuery = "DELETE FROM captain WHERE secondary_id = %s" % (idToDelete) # creates a SQL query to delete the row with ID identified
     execute_query(conn, sqlDeleteQuery) # executes the query
     conn.commit()
@@ -468,19 +468,31 @@ def delete_captain_record():
 # ============================================
 # Worked on by: Becky Tseng
 
-username = "admin"
-password = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
-ValidToken = {"404"}
+authorized_users = [
+    {
+        # default user
+        'username': 'username',
+        'password': 'password',
+        'role': 'default',
+    },
+    {
+        #admin user
+        'username': 'admin',
+        'password': 'password2.0',
+        'role': 'admin',
 
+    }
+    ]
 
-@app.route('/api/login', methods=["GET"])
+@app.route('/api/login', methods=['GET'])
 def authenticate():
-    if request.authorization: 
-        encoded = request.authorization.password.encode()
-        hashedResult = hashlib.sha256(encoded)
-        if request.authorization.username == username and hashedResult.hexdigest() == password:
-            return '<h1> WELCOME </h1>'
-    return make_response('COULD NOT VERIFY!', 401, {'WWW-Authenticate': 'Basic realm="login required"'})
+    username = request.headers['username'] #get the header parameters. request headers are interpreted as dictionaries, so value access is easy and direct
+    pw = request.headers['password']
+    for au in authorized_users: #loop over all users and find one that is authorized to access
+        if au['username'] == username and au['password'] == pw: #found an authorized user
+            return "You're authorized to see this but now we have to figure out what you want to do"
+        else:
+            return "The police are on their way" # Authentication failed message
 
 app.run()
 
