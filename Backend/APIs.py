@@ -96,6 +96,11 @@ def add_cargo():
 
     # Get the json data and assign it to the proper variables
     request_data = request.get_json() # gets the info from the JSON package
+
+    if 'secondary_id' not in request_data or 'weight' not in request_data or 'cargotype' not in request_data or 'secondary_ship_id' not in request_data:
+        missing = 'ERROR: All fields (secondary_id, weight, cargotype, secondary_ship_id) are required!'
+        return jsonify(missing)
+
     secondary_id = request_data['secondary_id']
     weight = request_data['weight']
     cargotype = request_data['cargotype']
