@@ -518,4 +518,7 @@ def authenticate():
 
 app.run()
 
-################################
+# ============================================
+#               References
+# ============================================
+# Code from class and ChatGPT for minor bug fixes
