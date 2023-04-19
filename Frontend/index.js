@@ -40,19 +40,30 @@ app.get('/list',function (req, res) {
     })
 });
 
-app.get('/table', function(req, res) {
+app.get('/cargo', function(req, res) {
     axios.get('http://127.0.0.1:5000/api/cargo/all')
       .then(response => {
         let userData = response.data;
         console.log(userData);
-        var items = [
-          {name:'node.js',url:'https://nodejs.org/en/'},
-          {name:'ejs',url:'https://ejs.co'},
-          {name:'expressjs',url:'https://expressjs.com'},
-          {name:'vuejs',url:'https://vuejs.org'},
-          {name:'nextjs',url:'https://nextjs.org'}
-        ];
-        res.render('pages/table', { table: items, data: userData });
+        res.render('pages/cargoAll', { data: userData });
+      });
+  });
+
+  app.get('/cargoArrived', function(req, res) {
+    axios.get('http://127.0.0.1:5000/api/cargo/all')
+      .then(response => {
+        let userData = response.data;
+        console.log(userData);
+        res.render('pages/cargoArrived', { data: userData });
+      });
+  });
+
+  app.get('/cargoEnRoute', function(req, res) {
+    axios.get('http://127.0.0.1:5000/api/cargo/all')
+      .then(response => {
+        let userData = response.data;
+        console.log(userData);
+        res.render('pages/cargoEnRoute', { data: userData });
       });
   });
        

@@ -1,0 +1,48 @@
+<%- include('../template/head')-%>
+
+<body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <%- include('../template/nav')-%>
+        <h1 class="cover-heading">Cargo</h1>
+        <div class="btn-group mb-3">
+            <a href="/cargo" class="btn btn-dark" id="all-btn">All</a>
+            <a href="/cargoArrived" class="btn btn-dark" id="arrived-btn">Arrived</a>
+            <a href="/cargoEnRoute" class="btn btn-dark" id="en-route-btn">En route</a>
+        </div>
+        <div class="container bg-light text-dark">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th> <!-- Don't worry, it's secondary ID -->
+                        <th>Cargotype</th>
+                        <th>Weight</th>
+                        <th>Departure</th>
+                        <th>Arrival</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%data.forEach(function(entry) {
+                      let arrivalDate = new Date(Date.parse(entry.arrival + ' UTC')); // This came from ChatGPT, parses the date string into a UTC date and creates a new object to compare against current date
+                      let today = new Date();
+                      if (arrivalDate <= today) { %>
+                    <tr>
+                        <td><%=entry.secondary_id%></td>
+                        <td><%=entry.cargotype%></td>
+                        <td><%=entry.weight%></td>
+                        <td><%=entry.departure%></td>
+                        <td><%=entry.arrival%></td>
+                    </tr>
+                    <% } }); %>
+                </tbody>
+            </table>
+        </div>
+        <%- include('../template/footer')-%>
+    </div>
+</body>
+<script>
+    window.onload = function() {
+        document.getElementById('cargo').classList.add('active');
+        document.getElementById('arrived-btn').classList.add('active');
+      };
+</script>
+</html>
