@@ -1,6 +1,7 @@
 const express = require('express')
 var path = require('path');
 var bodyParser = require('body-parser');
+const axios = require('axios'); // import the axios module
 const app = express();
 const port = 3000;
 // view engine setup
@@ -39,19 +40,22 @@ app.get('/list',function (req, res) {
     })
 });
 
-app.get('/table',function (req, res) {
-    //array with items to send
-    var items = [
-        {name:'node.js',url:'https://nodejs.org/en/'},
-        {name:'ejs',url:'https://ejs.co'},
-        {name:'expressjs',url:'https://expressjs.com'},
-        {name:'vuejs',url:'https://vuejs.org'},
-        {name:'nextjs',url:'https://nextjs.org'}];
-
-    res.render('pages/table',{
-        table:items
-    })
-});
+app.get('/table', function(req, res) {
+    axios.get('http://127.0.0.1:5000/api/cargo/all')
+      .then(response => {
+        let userData = response.data;
+        console.log(userData);
+        var items = [
+          {name:'node.js',url:'https://nodejs.org/en/'},
+          {name:'ejs',url:'https://ejs.co'},
+          {name:'expressjs',url:'https://expressjs.com'},
+          {name:'vuejs',url:'https://vuejs.org'},
+          {name:'nextjs',url:'https://nextjs.org'}
+        ];
+        res.render('pages/table', { table: items, data: userData });
+      });
+  });
+       
 
 //our alert message midleware
 function messages(req,res,next){
