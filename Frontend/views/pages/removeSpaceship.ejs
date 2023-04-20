@@ -1,0 +1,30 @@
+<%- include('../template/head')-%>
+<body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <%- include('../template/nav')-%>
+        <main role="main" class="inner cover">
+            <%- include('../template/messages')-%>
+            <h1 class="cover-heading">Remove a Spaceship</h1>
+            <form method="POST" action="/removeSpaceship">
+                <div class="form-group">
+                    <label for="spaceshipid">Spaceship ID</label> <!-- Should be secondary ID -->
+                    <input type="text" class="form-control" id="spaceshipid" name="spaceshipid" placeholder="Enter a Spaceship ID to be deleted" required>
+                </div>
+                <button type="submit" class="btn btn-dark">Submit</button>
+            </form>
+            <div class="btn-group mb-3 float-right">
+                <a href="/addSpaceship" class="btn btn-dark">Add</a>
+                <a href="/updateSpaceship" class="btn btn-dark">Update</a>
+                <a href="/removeSpaceship" class="btn btn-dark">Remove</a>
+            </div>
+        </main>
+        <%- include('../template/footer')-%>
+    </div>
+</body>
+<script>
+    window.onload = function () {
+        document.getElementById('spaceship').classList.add('active');
+    };
+</script>
+
+</html>

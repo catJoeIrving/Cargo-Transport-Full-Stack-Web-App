@@ -138,13 +138,10 @@ app.get('/updateSpaceship',messages,function (req, res) {
 
 
 app.post('/updateSpaceship',function (req, res) {
-    console.log(req.body);
+
     var spaceshipid = req.body.spaceshipid;
     var maxweight = req.body.maxweight;
     var captainid = req.body.captainid;
-    console.log(spaceshipid);
-    console.log(maxweight);
-    console.log(captainid);
 
     axios.put('http://127.0.0.1:5000/api/spaceship', {
         secondary_id: spaceshipid,
@@ -168,6 +165,34 @@ app.post('/updateSpaceship',function (req, res) {
         res.render('pages/updateSpaceship', { data: userData });
     });
 });
+
+app.get('/removeSpaceship',function (req, res) {
+    res.render('pages/removeSpaceship')
+});
+
+app.post('/removeSpaceship', function (req, res) {
+    var spaceshipid = req.body.spaceshipid;
+
+    axios.delete('http://127.0.0.1:5000/api/spaceship', {
+        data: {
+            secondary_id: spaceshipid // This was throwing errors, ChatGPT said wrap it in data: {} because DELETE takes different parameters
+            // than POST and PUT
+        }
+    })
+    .then(function (response) {
+        console.log(response);
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+
+    var message = "Spaceship successfully deleted!";
+    res.locals.message = message;
+
+    res.render('pages/removeSpaceship');
+});
+
+
 
 /* // Page for all spaceship records
 app.get('/updateSpaceship', function(req, res) {
