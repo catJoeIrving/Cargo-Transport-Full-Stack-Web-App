@@ -89,13 +89,19 @@ app.get('/spaceship', function(req, res) {
 
 // Page to add a spaceship
 app.get('/addSpaceship',messages,function (req, res) {
-    res.render('pages/addSpaceship');
+    axios.get('http://127.0.0.1:5000/api/captain/all')
+      .then(response => {
+        let userData = response.data;
+        console.log(userData);
+        res.render('pages/addSpaceship', { data: userData });
+      });
 });
 
 app.post('/addSpaceship',function (req, res) {
     var spaceshipid = req.body.spaceshipid;
     var maxweight = req.body.maxweight;
     var captainid = req.body.captainid;
+    console.log(captainid);
 
     axios.post('http://127.0.0.1:5000/api/spaceship', {
         secondary_id: spaceshipid,
@@ -111,9 +117,14 @@ app.post('/addSpaceship',function (req, res) {
 
     var message = "Spaceship successfully added!";
     res.locals.message = message;
-      
-    res.render('pages/addSpaceship');
+
+    axios.get('http://127.0.0.1:5000/api/captain/all')
+      .then(response => {
+        let userData = response.data;
+        console.log(userData);
+        res.render('pages/addSpaceship', { data: userData });
     });
+});
 
 /* // Page for all spaceship records
 app.get('/updateSpaceship', function(req, res) {

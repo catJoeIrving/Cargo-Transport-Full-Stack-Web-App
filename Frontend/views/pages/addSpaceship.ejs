@@ -15,8 +15,12 @@
                     <input type="text" class="form-control" id="maxweight" name="maxweight" placeholder="Enter the Max Weight" required>
                 </div>
                 <div class="form-group">
-                    <label for="Surname">Captain ID</label> <!-- Should be secondary ID -->
-                    <input type="text" class="form-control" id="captainid" name="captainid" placeholder="Enter the Captain ID" required>
+                    <label for="Surname">Captain</label>
+                    <select class="form-control" id="captainid" name="captainid" required>
+                        <% data.forEach(function(captain) { %>
+                            <option value="<%= captain.secondary_id %>"><%= captain.secondary_id %> - <%= captain.firstname %> <%= captain.lastname %></option>
+                        <% }); %>
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-dark">Submit</button>
             </form>
