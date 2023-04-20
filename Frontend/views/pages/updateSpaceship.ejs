@@ -1,0 +1,37 @@
+<%- include('../template/head')-%>
+<body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <%- include('../template/nav')-%>
+        <main role="main" class="inner cover">
+            <%- include('../template/messages')-%>
+            <h1 class="cover-heading">Update a Spaceship</h1>
+            <form method="POST" action="/updateSpaceship">
+                <div class="form-group">
+                    <label for="Name">Spaceship ID</label> <!-- Should be secondary ID -->
+                    <input type="text" class="form-control" id="spaceshipid" name="spaceshipid" placeholder="Enter a Spaceship ID" required>
+                </div>
+                <div class="form-group">
+                    <label for="Surname">Max Weight</label>
+                    <input type="text" class="form-control" id="maxweight" name="maxweight" placeholder="Enter the Max Weight">
+                </div>
+                <div class="form-group">
+                    <label for="Surname">Captain</label>
+                    <select class="form-control" id="captainid" name="captainid">
+                        <% data.forEach(function(captain) { %>
+                            <option value="<%= captain.secondary_id %>"><%= captain.secondary_id %> - <%= captain.firstname %> <%= captain.lastname %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-dark">Submit</button>
+            </form>
+        </main>
+        <%- include('../template/footer')-%>
+    </div>
+</body>
+<script>
+    window.onload = function () {
+        document.getElementById('spaceship').classList.add('active');
+    };
+</script>
+
+</html>
