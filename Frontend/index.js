@@ -14,6 +14,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
+//our alert message midleware
+function messages(req,res,next){
+    var message;
+    res.locals.message = message;
+    next();
+}
+
 app.get('/',function (req, res) {
     res.render('pages/home')
 });
@@ -67,13 +74,68 @@ app.get('/cargo', function(req, res) {
       });
   });
        
+// Spachship Table Page
+// Worked on by Joseph Irving
 
-//our alert message midleware
-function messages(req,res,next){
-    var message;
+// Page for all spaceship records
+app.get('/spaceship', function(req, res) {
+    axios.get('http://127.0.0.1:5000/api/spaceship/all')
+      .then(response => {
+        let userData = response.data;
+        console.log(userData);
+        res.render('pages/spaceship', { data: userData });
+      });
+  });
+
+// Page to add a spaceship
+app.get('/addSpaceship',messages,function (req, res) {
+    res.render('pages/addSpaceship');
+});
+
+app.post('/addSpaceship',function (req, res) {
+    var spaceshipid = req.body.spaceshipid;
+    var maxweight = req.body.maxweight;
+    var captainid = req.body.captainid;
+
+    axios.post('http://127.0.0.1:5000/api/spaceship', {
+        secondary_id: spaceshipid,
+        maxweight: maxweight,
+        captainid: captainid
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    var message = "Spaceship successfully added!";
     res.locals.message = message;
-    next();
-}
+      
+    res.render('pages/addSpaceship');
+    });
+
+/* // Page for all spaceship records
+app.get('/updateSpaceship', function(req, res) {
+    axios.get('http://127.0.0.1:5000/api/spaceship/all')
+      .then(response => {
+        let userData = response.data;
+        console.log(userData);
+        res.render('pages/updateSpaceship', { data: userData });
+      });
+  });
+
+// Page for all spaceship records
+app.get('/removeSpaceship', function(req, res) {
+    axios.get('http://127.0.0.1:5000/api/spaceship/all')
+      .then(response => {
+        let userData = response.data;
+        console.log(userData);
+        res.render('pages/removeSpaceship', { data: userData });
+      });
+  }); */
+
+
 
 app.get('/form',messages,function (req, res) {
     res.render('pages/form');
@@ -86,3 +148,8 @@ app.post('/form',function (req, res) {
 });
 
 app.listen(port, () => console.log(`MasterEJS app Started on port ${port}!`));
+
+// References:
+// ChatGPT
+// https://axios-http.com/docs/post_example
+//

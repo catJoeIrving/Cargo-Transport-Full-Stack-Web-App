@@ -1,9 +1,9 @@
-<!-- Messages Partial Template -->
+<!-- Updated Messages -->
 <div class="container">
-    <% if(message){ %>
+    <% if(typeof message === 'string'){ %>
     <div class="alert alert-primary alert-dismissible">
         <span class="close" onclick="this.parentElement.style.display='none';">&times;</span>
-        <strong><%= message.name%> </strong><strong><%= message.surname%></strong>
+        <%= message %>
     </div>
     <% } %>
 </div>

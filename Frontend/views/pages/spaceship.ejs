@@ -1,34 +1,33 @@
 <%- include('../template/head')-%>
 
 <body class="text-center">
+    
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
         <%- include('../template/nav')-%>
-        <h1 class="cover-heading">Cargo</h1>
-        <div class="btn-group mb-3">
-            <a href="/cargo" class="btn btn-dark" id="all-btn">All</a>
-            <a href="/cargoArrived" class="btn btn-dark" id="arrived-btn">Arrived</a>
-            <a href="/cargoEnRoute" class="btn btn-dark" id="en-route-btn">En route</a>
-        </div>
+        <h1 class="cover-heading">Spaceship</h1>
+        
         <div class="container bg-light text-dark">
             
             <table class="table table-striped">
+                <div class="btn-group mb-3 float-right">
+                    <a href="/addSpaceship" class="btn btn-dark">Add</a>
+                    <a href="/updateSpaceship" class="btn btn-dark">Update</a>
+                    <a href="/removeSpaceship" class="btn btn-dark">Remove</a>
+                </div>
+                
                 <thead>
                     <tr>
                         <th>ID</th> <!-- Don't worry, it's secondary ID -->
-                        <th>Cargotype</th>
-                        <th>Weight</th>
-                        <th>Departure</th>
-                        <th>Arrival</th>
+                        <th>Max Weight</th>
+                        <th>Captain ID</th> <!-- Don't worry, it's secondary ID -->
                     </tr>
                 </thead>
                 <tbody>
                     <%data.forEach(function(entry) {%>
                     <tr>
                         <td><%=entry.secondary_id%></td>
-                        <td><%=entry.cargotype%></td>
-                        <td><%=entry.weight%></td>
-                        <td><%=entry.departure%></td>
-                        <td><%=entry.arrival%></td>
+                        <td><%=entry.maxweight%></td>
+                        <td><%=entry.captainid%></td>
                     </tr>
                     <%});%>
                 </tbody>
@@ -40,8 +39,7 @@
 <script>
     window.onload = function() {
         const path = window.location.pathname;
-        document.getElementById('all-btn').classList.add('active');
-        document.getElementById('cargo').classList.add('active');
+        document.getElementById('spaceship').classList.add('active');
     };
 </script>
 </html>
