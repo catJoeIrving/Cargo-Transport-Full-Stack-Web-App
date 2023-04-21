@@ -1,0 +1,30 @@
+<%- include('../template/head')-%>
+<body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <%- include('../template/nav')-%>
+        <main role="main" class="inner cover">
+            <%- include('../template/messages')-%>
+            <h1 class="cover-heading">Remove a Cargo record</h1>
+            <form method="POST" action="/removeCargo">
+                <div class="form-group">
+                    <label for="cargoid">Cargo ID</label> <!-- Should be secondary ID -->
+                    <input type="text" class="form-control" id="cargoid" name="cargoid" placeholder="Enter the ID of the Cargo to be deleted" required>
+                </div>
+                <button type="submit" class="btn btn-dark">Submit</button>
+            </form>
+            <div class="btn-group mb-3 float-right">
+                <a href="/addCargo" class="btn btn-dark">Add</a>
+                <a href="/updateCargo" class="btn btn-dark">Update</a>
+                <a href="/removeCargo" class="btn btn-dark">Remove</a>
+            </div>
+        </main>
+        <%- include('../template/footer')-%>
+    </div>
+</body>
+<script>
+    window.onload = function () {
+        document.getElementById('cargo').classList.add('active');
+    };
+</script>
+
+</html>

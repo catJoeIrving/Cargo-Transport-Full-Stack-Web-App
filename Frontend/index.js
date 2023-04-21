@@ -25,27 +25,7 @@ app.get('/',function (req, res) {
     res.render('pages/home')
 });
 
-app.get('/links',function (req, res) {
-    //array with items to send
-    var items = [
-        {name:'node.js',url:'https://nodejs.org/en/'},
-        {name:'ejs',url:'https://ejs.co'},
-        {name:'expressjs',url:'https://expressjs.com'},
-        {name:'vuejs',url:'https://vuejs.org'},
-        {name:'nextjs',url:'https://nextjs.org'}];
 
-    res.render('pages/links',{
-        links:items
-    })
-});
-
-app.get('/list',function (req, res) {
-    //array with items to send
-    var items = ['node.js','expressjs','ejs','javascript','bootstarp'];
-    res.render('pages/list',{
-        list:items
-    })
-});
 
 app.get('/cargo', function(req, res) {
     axios.get('http://127.0.0.1:5000/api/cargo/all')
@@ -166,6 +146,8 @@ app.post('/updateSpaceship',function (req, res) {
     });
 });
 
+
+// To remove a Spaceship
 app.get('/removeSpaceship',function (req, res) {
     res.render('pages/removeSpaceship')
 });
@@ -192,43 +174,131 @@ app.post('/removeSpaceship', function (req, res) {
     res.render('pages/removeSpaceship');
 });
 
-
-
-/* // Page for all spaceship records
-app.get('/updateSpaceship', function(req, res) {
-    axios.get('http://127.0.0.1:5000/api/spaceship/all')
-      .then(response => {
-        let userData = response.data;
-        console.log(userData);
-        res.render('pages/updateSpaceship', { data: userData });
-      });
-  });
-
-// Page for all spaceship records
-app.get('/removeSpaceship', function(req, res) {
-    axios.get('http://127.0.0.1:5000/api/spaceship/all')
-      .then(response => {
-        let userData = response.data;
-        console.log(userData);
-        res.render('pages/removeSpaceship', { data: userData });
-      });
-  }); */
-
-
-
-app.get('/form',messages,function (req, res) {
-    res.render('pages/form');
+app.get('/addCargo',messages,function (req, res) {
+  axios.get('http://127.0.0.1:5000/api/spaceship/all')
+    .then(response => {
+      let userData = response.data;
+      console.log(userData);
+      res.render('pages/addCargo', { data: userData });
+    });
 });
 
-app.post('/form',function (req, res) {
-    var message=req.body;
-    res.locals.message = message;
-    res.render('pages/form');
+
+app.post('/addCargo',function (req, res) {
+  var cargoid = req.body.cargoid;
+  var weight = req.body.weight;
+  var cargotype = req.body.cargotype;
+  var spaceship = req.body.spaceship;
+
+  
+  axios.post('http://127.0.0.1:5000/api/cargo', {
+      secondary_id: cargoid,
+      weight: weight,
+      cargotype: cargotype,
+      secondary_ship_id: spaceship
+    })
+    .then(function (response) {
+      console.log(response);
+      if (response.data === true) {
+        var message = "Cargo successfully added!";
+      }
+      else {
+        var message = response.data;
+      }
+      res.locals.message = message;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+  axios.get('http://127.0.0.1:5000/api/spaceship/all')
+    .then(response => {
+      let userData = response.data;
+      console.log(userData);
+      res.render('pages/addCargo', { data: userData });
+    });
+});
+
+app.get('/updateCargo',messages,function (req, res) {
+  axios.get('http://127.0.0.1:5000/api/spaceship/all')
+    .then(response => {
+      let userData = response.data;
+      console.log(userData);
+      res.render('pages/updateCargo', { data: userData });
+    });
+});
+
+
+app.post('/updateCargo',function (req, res) {
+  var cargoid = req.body.cargoid;
+  var weight = req.body.weight;
+  var cargotype = req.body.cargotype;
+  var spaceship = req.body.spaceship;
+  var departure = req.body.departure;
+  var arrival = req.body.arrival;
+  console.log(cargotype, departure, arrival, arrival)
+
+  
+  axios.put('http://127.0.0.1:5000/api/cargo', {
+      secondary_id: cargoid,
+      weight: weight,
+      cargotype: cargotype,
+      secondary_ship_id: spaceship,
+      departure: departure,
+      arrival: arrival
+    })
+    .then(function (response) {
+      console.log(response);
+      if (response.data === true) {
+        var message = "Cargo successfully updated!";
+      }
+      else {
+        var message = response.data;
+      }
+      res.locals.message = message;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+  axios.get('http://127.0.0.1:5000/api/spaceship/all')
+    .then(response => {
+      let userData = response.data;
+      console.log(userData);
+      res.render('pages/updateCargo', { data: userData });
+    });
+});
+
+// To remove a Cargo record
+app.get('/removeCargo',function (req, res) {
+  res.render('pages/removeCargo')
+});
+
+app.post('/removeCargo', function (req, res) {
+  var cargoid = req.body.cargoid;
+
+  axios.delete('http://127.0.0.1:5000/api/cargo', {
+      data: {
+        secondary_id: cargoid
+      }
+  })
+  .then(function (response) {
+      console.log(response);
+  })
+  .catch(function (error) {
+      console.log(error);
+  });
+
+  var message = "Cargo successfully deleted!";
+  res.locals.message = message;
+
+  res.render('pages/removeCargo');
 });
 
 app.listen(port, () => console.log(`MasterEJS app Started on port ${port}!`));
 
 // References:
 // ChatGPT
+// Green template example from class
 // https://axios-http.com/docs/post_example
 //

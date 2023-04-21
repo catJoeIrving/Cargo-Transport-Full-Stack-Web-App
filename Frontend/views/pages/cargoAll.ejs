@@ -12,6 +12,11 @@
         <div class="container bg-light text-dark">
             
             <table class="table table-striped">
+                <div class="btn-group mb-3 float-right">
+                    <a href="/addCargo" class="btn btn-dark">Add</a>
+                    <a href="/updateCargo" class="btn btn-dark">Update</a>
+                    <a href="/removeCargo" class="btn btn-dark">Remove</a>
+                </div>
                 <thead>
                     <tr>
                         <th>ID</th> <!-- Don't worry, it's secondary ID -->
@@ -19,6 +24,7 @@
                         <th>Weight</th>
                         <th>Departure</th>
                         <th>Arrival</th>
+                        <th>Spaceship</th> <!-- Don't worry, it's also secondary ID -->
                     </tr>
                 </thead>
                 <tbody>
@@ -29,6 +35,7 @@
                         <td><%=entry.weight%></td>
                         <td><%=entry.departure%></td>
                         <td><%=entry.arrival%></td>
+                        <td><%=entry.shipid%></td>
                     </tr>
                     <%});%>
                 </tbody>
