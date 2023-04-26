@@ -1,0 +1,33 @@
+<%- include('../template/head')-%>
+<body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <main role="main" class="inner cover">
+            <h1 class="cover-heading">Welcome</h1>
+            <p class="lead">Please log in so we know you're not a hacker</p>
+            <main id="main-holder">
+                <h1 id="login-header">Login</h1>
+                <% if (message !== undefined) { %>
+                    <div style="color: red"><%= message %></div>
+                <% } %>
+                <form method="GET" action="/login">
+                    <div class="form-group">
+                        <label for="username">Username</label> <!-- Prompts username -->
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" >
+                    </div>
+                    <button type="submit" class="btn btn-dark">Submit</button>
+                </form>
+        </main>
+        
+        <%- include('../template/footerBecky')-%>
+    </div>
+</body>
+<script>
+    window.onload = function() {
+        document.getElementById('login').classList.add('active');
+      };
+</script>
+</html>

@@ -22,21 +22,61 @@ function messages(req,res,next){
 }
 
 app.get('/',function (req, res) {
-    res.render('pages/home')
+  res.render('pages/login')
 });
 
+app.get('/home',function (req, res) {
+  res.render('pages/home')
+});
 
+app.get('/login', function (req, res) {
+  var login = 'http://127.0.0.1:5000/api/login'
+  var username = req.query.username; 
+  var password = req.query.password;
+  let config = 
+  {
+    headers: 
+    {
+      username: username,
+      password: password
+    }
+  }
 
-app.get('/cargo', function(req, res) {
+  axios.get(login, config)
+      .then((response)=> {
+        let apiResponse = response.data
+        console.log('username:', username);
+        console.log('password:', password);
+        if (apiResponse == 'False')
+        {
+          res.render('pages/loginUnsuccessful', 
+          {
+            message: 'Login unsuccessful'
+            
+          });
+        } 
+        else        
+        {
+          res.render('pages/home')
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      });
+});
+
+app.get('/cargo', function(req, res) 
+{
     axios.get('http://127.0.0.1:5000/api/cargo/all')
       .then(response => {
         let userData = response.data;
         console.log(userData);
         res.render('pages/cargoAll', { data: userData });
       });
-  });
+});
 
-  app.get('/cargoArrived', function(req, res) {
+  app.get('/cargoArrived', function(req, res) 
+  {
     axios.get('http://127.0.0.1:5000/api/cargo/all')
       .then(response => {
         let userData = response.data;
@@ -45,20 +85,22 @@ app.get('/cargo', function(req, res) {
       });
   });
 
-  app.get('/cargoEnRoute', function(req, res) {
+  app.get('/cargoEnRoute', function(req, res) 
+  {
     axios.get('http://127.0.0.1:5000/api/cargo/all')
       .then(response => {
         let userData = response.data;
         console.log(userData);
         res.render('pages/cargoEnRoute', { data: userData });
       });
-  });
-       
+  }); 
+      
 // Spachship Table Page
 // Worked on by Joseph Irving
 
 // Page for all spaceship records
-app.get('/spaceship', function(req, res) {
+app.get('/spaceship', function(req, res) 
+{
     axios.get('http://127.0.0.1:5000/api/spaceship/all')
       .then(response => {
         let userData = response.data;
@@ -68,7 +110,8 @@ app.get('/spaceship', function(req, res) {
   });
 
 // Page to add a spaceship
-app.get('/addSpaceship',messages,function (req, res) {
+app.get('/addSpaceship',messages,function (req, res) 
+{
     axios.get('http://127.0.0.1:5000/api/captain/all')
       .then(response => {
         let userData = response.data;
@@ -77,7 +120,8 @@ app.get('/addSpaceship',messages,function (req, res) {
       });
 });
 
-app.post('/addSpaceship',function (req, res) {
+app.post('/addSpaceship',function (req, res) 
+{
     var spaceshipid = req.body.spaceshipid;
     var maxweight = req.body.maxweight;
     var captainid = req.body.captainid;
@@ -107,7 +151,8 @@ app.post('/addSpaceship',function (req, res) {
 });
 
 // Page to update a spaceship
-app.get('/updateSpaceship',messages,function (req, res) {
+app.get('/updateSpaceship',messages,function (req, res) 
+{
     axios.get('http://127.0.0.1:5000/api/captain/all')
       .then(response => {
         let userData = response.data;
@@ -117,7 +162,8 @@ app.get('/updateSpaceship',messages,function (req, res) {
 });
 
 
-app.post('/updateSpaceship',function (req, res) {
+app.post('/updateSpaceship',function (req, res) 
+{
 
     var spaceshipid = req.body.spaceshipid;
     var maxweight = req.body.maxweight;
@@ -148,11 +194,13 @@ app.post('/updateSpaceship',function (req, res) {
 
 
 // To remove a Spaceship
-app.get('/removeSpaceship',function (req, res) {
+app.get('/removeSpaceship',function (req, res) 
+{
     res.render('pages/removeSpaceship')
 });
 
-app.post('/removeSpaceship', function (req, res) {
+app.post('/removeSpaceship', function (req, res) 
+{
     var spaceshipid = req.body.spaceshipid;
 
     axios.delete('http://127.0.0.1:5000/api/spaceship', {
@@ -174,7 +222,8 @@ app.post('/removeSpaceship', function (req, res) {
     res.render('pages/removeSpaceship');
 });
 
-app.get('/addCargo',messages,function (req, res) {
+app.get('/addCargo',messages,function (req, res) 
+{
   axios.get('http://127.0.0.1:5000/api/spaceship/all')
     .then(response => {
       let userData = response.data;
@@ -184,7 +233,8 @@ app.get('/addCargo',messages,function (req, res) {
 });
 
 
-app.post('/addCargo',function (req, res) {
+app.post('/addCargo',function (req, res) 
+{
   var cargoid = req.body.cargoid;
   var weight = req.body.weight;
   var cargotype = req.body.cargotype;
@@ -229,7 +279,8 @@ app.get('/updateCargo',messages,function (req, res) {
 });
 
 
-app.post('/updateCargo',function (req, res) {
+app.post('/updateCargo',function (req, res) 
+{
   var cargoid = req.body.cargoid;
   var weight = req.body.weight;
   var cargotype = req.body.cargotype;
@@ -270,11 +321,13 @@ app.post('/updateCargo',function (req, res) {
 });
 
 // To remove a Cargo record
-app.get('/removeCargo',function (req, res) {
+app.get('/removeCargo',function (req, res) 
+{
   res.render('pages/removeCargo')
 });
 
-app.post('/removeCargo', function (req, res) {
+app.post('/removeCargo', function (req, res) 
+{
   var cargoid = req.body.cargoid;
 
   axios.delete('http://127.0.0.1:5000/api/cargo', {
@@ -294,6 +347,148 @@ app.post('/removeCargo', function (req, res) {
 
   res.render('pages/removeCargo');
 });
+
+// Page to render Captain page 
+// Worked on by Becky Tseng 
+
+// Captain page to show all captains 
+app.get('/captain', function(req, res) 
+{
+  axios.get('http://127.0.0.1:5000/api/captain/all')
+    .then(response => {
+      let userData = response.data;
+      console.log(userData);
+      res.render('pages/captainAll', { data: userData });
+    });
+});
+
+// Adding a captain 
+
+app.get('/addCaptain',messages,function (req, res) 
+{
+  axios.get('http://127.0.0.1:5000/api/captain/all')
+    .then(response => {
+      let userData = response.data;
+      console.log(userData);
+      res.render('pages/addCaptain', { data: userData });
+    });
+});
+
+app.post('/addCaptain',function (req, res) 
+{
+  var captainid = req.body.captainid;
+  var firstname = req.body.firstname;
+  var lastname = req.body.lastname;
+  var rank = req.body.rank;
+  var homeplanet = req.body.homeplanet;
+
+  axios.post('http://127.0.0.1:5000/api/captain', {
+      secondary_id: captainid,
+      firsname: firstname,
+      lastname: lastname,
+      rank: rank,
+      homeplanet: homeplanet
+    })
+    .then(function (response) {
+      console.log(response);
+      if (response.data === true) {
+        var message = "New captain on board!";
+      }
+      else {
+        var message = response.data;
+      }
+      res.locals.message = message;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+  axios.get('http://127.0.0.1:5000/api/captain/all')
+    .then(response => {
+      let userData = response.data;
+      console.log(userData);
+      res.render('pages/addCaptain', { data: userData });
+    });
+});
+
+// Update captain information 
+
+app.get('/updateCaptain',messages,function (req, res) {
+  axios.get('http://127.0.0.1:5000/api/captain/all')
+    .then(response => {
+      let userData = response.data;
+      console.log(userData);
+      res.render('pages/updateCaptain', { data: userData });
+    });
+});
+
+
+app.post('/updateCaptain',function (req, res) {
+  var captainid = req.body.captainid;
+  var firstname = req.body.firstname;
+  var lastname = req.body.lastname;
+  var rank = req.body.rank;
+  var homeplanet = req.body.homeplanet;
+  console.log(captainid, firstname, lastname, rank, homeplanet)
+
+  
+  axios.put('http://127.0.0.1:5000/api/captain', {
+      secondary_id: captainid,
+      firstname: firstname,
+      lastname: lastname,
+      rank: rank,
+      homeplanet: homeplanet,
+    })
+    .then(function (response) {
+      console.log(response);
+      if (response.data === true) {
+        var message = "Captain information successfully updated!";
+      }
+      else {
+        var message = response.data;
+      }
+      res.locals.message = message;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+  axios.get('http://127.0.0.1:5000/api/captain/all')
+    .then(response => {
+      let userData = response.data;
+      console.log(userData);
+      res.render('pages/updateCaptain', { data: userData });
+    });
+});
+
+// Remove captain
+
+app.get('/removeCaptain',function (req, res) {
+  res.render('pages/removeCaptain')
+});
+
+app.post('/removeCaptain', function (req, res) {
+  var captainid = req.body.captainid;
+
+  axios.delete('http://127.0.0.1:5000/api/captain', {
+      data: 
+      {
+        secondary_id: captainid
+      }
+  })
+  .then(function (response) {
+      console.log(response);
+  })
+  .catch(function (error) {
+      console.log(error);
+  });
+
+  var message = "Captain successfully deleted!";
+  res.locals.message = message;
+
+  res.render('pages/removeCaptain');
+});
+
 
 app.listen(port, () => console.log(`MasterEJS app Started on port ${port}!`));
 

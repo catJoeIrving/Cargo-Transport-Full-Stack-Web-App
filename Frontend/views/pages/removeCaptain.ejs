@@ -1,0 +1,30 @@
+<%- include('../template/head')-%>
+<body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <%- include('../template/nav')-%>
+        <main role="main" class="inner cover">
+            <%- include('../template/messages')-%>
+            <h1 class="cover-heading">Remove a captain record</h1>
+            <form method="POST" action="/removeCaptain">
+                <div class="form-group">
+                    <label for="captainid">Captain ID</label> <!-- Should be secondary ID -->
+                    <input type="text" class="form-control" id="captainid" name="captainid" placeholder="Enter the ID of the captain to be deleted" required>
+                </div>
+                <button type="submit" class="btn btn-dark">Submit</button>
+            </form>
+            <div class="btn-group mb-3 float-right">
+                <a href="/addCaptain" class="btn btn-dark">Add</a>
+                <a href="/updateCaptain" class="btn btn-dark">Update</a>
+                <a href="/removeCaptain" class="btn btn-dark">Remove</a>
+            </div>
+        </main>
+        <%- include('../template/footerBecky')-%>
+    </div>
+</body>
+<script>
+    window.onload = function () {
+        document.getElementById('captain').classList.add('active');
+    };
+</script>
+
+</html>

@@ -504,17 +504,19 @@ authorized_users = [
         'role': 'admin',
 
     }
-    ]
+]
+
 
 @app.route('/api/login', methods=['GET'])
 def authenticate():
-    username = request.headers['username'] #get the header parameters. request headers are interpreted as dictionaries, so value access is easy and direct
-    pw = request.headers['password']
+    username = request.headers.get('username') #get the header parameters. request headers are interpreted as dictionaries, so value access is easy and direct
+    password = request.headers.get('password')
+    print('username:', username)
+    print('password:', password)
     for au in authorized_users: #loop over all users and find one that is authorized to access
-        if au['username'] == username and au['password'] == pw: #found an authorized user
-            return jsonify(True)
-        else:
-            return jsonify(False) # Authentication failed
+        if au['username'] == username and au['password'] == password: #found an authorized user
+            return 'True'
+    return 'False' # Authentication failed
 
 app.run()
 

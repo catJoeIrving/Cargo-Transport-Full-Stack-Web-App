@@ -1,0 +1,48 @@
+<%- include('../template/head')-%>
+
+<body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <%- include('../template/nav')-%>
+        <h1 class="cover-heading">Captain</h1>
+        
+        <div class="container bg-light text-dark">
+            
+            <table class="table table-striped">
+                <div class="btn-group mb-3 float-right">
+                    <a href="/addCaptain" class="btn btn-dark">Add</a>
+                    <a href="/updateCaptain" class="btn btn-dark">Update</a>
+                    <a href="/removeCaptain" class="btn btn-dark">Remove</a>
+                </div>
+                <thead>
+                    <tr>
+                        <th>ID</th> <!-- Don't worry, it's secondary ID -->
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>Rank</th>
+                        <th>Home planet</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%data.forEach(function(entry) {%>
+                    <tr>
+                        <td><%=entry.secondary_id%></td>
+                        <td><%=entry.firstname%></td>
+                        <td><%=entry.lastname%></td>
+                        <td><%=entry.rank%></td>
+                        <td><%=entry.homeplanet%></td>
+                    </tr>
+                    <%});%>
+                </tbody>
+            </table>
+        </div>
+        <%- include('../template/footerBecky')-%>
+    </div>
+</body>
+<script>
+    window.onload = function() {
+        const path = window.location.pathname;
+        document.getElementById('all-btn').classList.add('active');
+        document.getElementById('captain').classList.add('active');
+    };
+</script>
+</html>
