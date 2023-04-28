@@ -25,10 +25,6 @@ app.get('/',function (req, res) {
   res.render('pages/login')
 });
 
-app.get('/home',function (req, res) {
-  res.render('pages/home')
-});
-
 app.get('/login', function (req, res) {
   var login = 'http://127.0.0.1:5000/api/login'
   var username = req.query.username; 
@@ -57,7 +53,12 @@ app.get('/login', function (req, res) {
         } 
         else        
         {
-          res.render('pages/home')
+          axios.get('http://127.0.0.1:5000/api/cargo/all')
+            .then(response => {
+            let userData = response.data;
+            console.log(userData);
+            res.render('pages/cargoEnRoute', { data: userData });
+          });
         }
       })
       .catch((error) => {
