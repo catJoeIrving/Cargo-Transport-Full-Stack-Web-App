@@ -26,7 +26,8 @@
                         <th>Spaceship</th> <!-- Don't worry, it's also secondary ID -->
                     </tr>
                 </thead>
-                <tbody>
+                <tbody><!-- Loops through the records in the database and only shows records with with a departure date and no arrival, or an arrival in the future -->
+                    
                     <%data.forEach(function(entry) {
                       let arrivalDate = new Date(Date.parse(entry.arrival + ' UTC')); // This came from ChatGPT, parses the date string into a UTC date and creates a new object to compare against current date
                       let today = new Date();
@@ -46,6 +47,7 @@
         <%- include('../template/footer')-%>
     </div>
 </body>
+<!-- sets cargo and en route buttons to active -->
 <script>
     window.onload = function() {
         document.getElementById('cargo').classList.add('active');

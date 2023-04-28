@@ -12,7 +12,7 @@
         <div class="container bg-light text-dark">
             
             <table class="table table-striped">
-                <div class="btn-group mb-3 float-right">
+                <div class="btn-group mb-3 float-right"> <!--CRUD ops buttons for table-->
                     <a href="/addCargo" class="btn btn-dark">Add</a>
                     <a href="/updateCargo" class="btn btn-dark">Update</a>
                     <a href="/removeCargo" class="btn btn-dark">Remove</a>
@@ -27,7 +27,7 @@
                         <th>Spaceship</th> <!-- Don't worry, it's also secondary ID -->
                     </tr>
                 </thead>
-                <tbody>
+                <tbody> <!-- adds each record to the table -->
                     <%data.forEach(function(entry) {%>
                     <tr>
                         <td><%=entry.secondary_id%></td>
@@ -44,6 +44,7 @@
         <%- include('../template/footer')-%>
     </div>
 </body>
+<!-- Underlines the all and cargo buttons -->
 <script>
     window.onload = function() {
         const path = window.location.pathname;

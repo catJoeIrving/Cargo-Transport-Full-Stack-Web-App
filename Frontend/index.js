@@ -66,6 +66,11 @@ app.get('/login', function (req, res) {
       });
 });
 
+
+// Cargo pages
+// Worked on by Joseph Irving
+
+// These three do the same thing, each gets the records from the cargo/all API so the page can loop through them to load as appropriate for that page
 app.get('/cargo', function(req, res) 
 {
     axios.get('http://127.0.0.1:5000/api/cargo/all')
@@ -99,7 +104,7 @@ app.get('/cargo', function(req, res)
 // Spachship Table Page
 // Worked on by Joseph Irving
 
-// Page for all spaceship records
+// Page for all spaceship records, grabs all records from the spaceship/all api and loads the page with it
 app.get('/spaceship', function(req, res) 
 {
     axios.get('http://127.0.0.1:5000/api/spaceship/all')
@@ -111,6 +116,7 @@ app.get('/spaceship', function(req, res)
   });
 
 // Page to add a spaceship
+// This gets all captains from captain table so the addSpaceship page can load with a drop down selection of available captains
 app.get('/addSpaceship',messages,function (req, res) 
 {
     axios.get('http://127.0.0.1:5000/api/captain/all')
@@ -121,13 +127,15 @@ app.get('/addSpaceship',messages,function (req, res)
       });
 });
 
+// POST version of the add spaceship page to send the information to the POST api on the back end to make a new spaceship in the DB
 app.post('/addSpaceship',function (req, res) 
+// Get the variables from the body and assign them
 {
     var spaceshipid = req.body.spaceshipid;
     var maxweight = req.body.maxweight;
     var captainid = req.body.captainid;
     console.log(captainid);
-
+// Call the post API with the variables from the body
     axios.post('http://127.0.0.1:5000/api/spaceship', {
         secondary_id: spaceshipid,
         maxweight: maxweight,
@@ -139,10 +147,10 @@ app.post('/addSpaceship',function (req, res)
       .catch(function (error) {
         console.log(error);
       });
-
+// Success message to be shown after submission
     var message = "Spaceship successfully added!";
     res.locals.message = message;
-
+// Calls captain/all API again so the page can again load with captains drop down for a new POST
     axios.get('http://127.0.0.1:5000/api/captain/all')
       .then(response => {
         let userData = response.data;
@@ -152,6 +160,8 @@ app.post('/addSpaceship',function (req, res)
 });
 
 // Page to update a spaceship
+// This gets all captains from captain table so the updateSpaceship page can load with a drop down selection of available captains
+
 app.get('/updateSpaceship',messages,function (req, res) 
 {
     axios.get('http://127.0.0.1:5000/api/captain/all')
@@ -162,14 +172,14 @@ app.get('/updateSpaceship',messages,function (req, res)
       });
 });
 
-
+// POST version of updateSpaceship page
 app.post('/updateSpaceship',function (req, res) 
 {
-
+// Assign variables from body
     var spaceshipid = req.body.spaceshipid;
     var maxweight = req.body.maxweight;
     var captainid = req.body.captainid;
-
+// Send variables to PUT API 
     axios.put('http://127.0.0.1:5000/api/spaceship', {
         secondary_id: spaceshipid,
         maxweight: maxweight,
@@ -181,10 +191,10 @@ app.post('/updateSpaceship',function (req, res)
       .catch(function (error) {
         console.log(error);
       });
-
+// Success message upon submission
     var message = "Spaceship successfully updated!";
     res.locals.message = message;
-
+// Get captains again for dropdown selection
     axios.get('http://127.0.0.1:5000/api/captain/all')
       .then(response => {
         let userData = response.data;
@@ -200,6 +210,7 @@ app.get('/removeSpaceship',function (req, res)
     res.render('pages/removeSpaceship')
 });
 
+// Gets spaceship ID from body, calls DELETE api for spaceship and sends it the information from body
 app.post('/removeSpaceship', function (req, res) 
 {
     var spaceshipid = req.body.spaceshipid;
@@ -216,13 +227,14 @@ app.post('/removeSpaceship', function (req, res)
     .catch(function (error) {
         console.log(error);
     });
-
+// Success message on submission
     var message = "Spaceship successfully deleted!";
     res.locals.message = message;
 
     res.render('pages/removeSpaceship');
 });
 
+// Gets spaceship records to load as drop down selection for add cargo page
 app.get('/addCargo',messages,function (req, res) 
 {
   axios.get('http://127.0.0.1:5000/api/spaceship/all')
@@ -233,7 +245,7 @@ app.get('/addCargo',messages,function (req, res)
     });
 });
 
-
+// POST version of addCargo, first get variables from the body and assign them
 app.post('/addCargo',function (req, res) 
 {
   var cargoid = req.body.cargoid;
@@ -241,7 +253,7 @@ app.post('/addCargo',function (req, res)
   var cargotype = req.body.cargotype;
   var spaceship = req.body.spaceship;
 
-  
+  // send variables to cargo POST API
   axios.post('http://127.0.0.1:5000/api/cargo', {
       secondary_id: cargoid,
       weight: weight,
@@ -250,6 +262,7 @@ app.post('/addCargo',function (req, res)
     })
     .then(function (response) {
       console.log(response);
+      // backend API returns custom error messages if there's a problem, otherwise returns success message for the user
       if (response.data === true) {
         var message = "Cargo successfully added!";
       }
@@ -262,6 +275,7 @@ app.post('/addCargo',function (req, res)
       console.log(error);
     });
 
+    // gets all spaceship records to load the addCargo page with a drop down selector for spaceships
   axios.get('http://127.0.0.1:5000/api/spaceship/all')
     .then(response => {
       let userData = response.data;
@@ -270,6 +284,7 @@ app.post('/addCargo',function (req, res)
     });
 });
 
+    // gets all spaceship records to load the updateCargo page with a drop down selector for spaceships
 app.get('/updateCargo',messages,function (req, res) {
   axios.get('http://127.0.0.1:5000/api/spaceship/all')
     .then(response => {
@@ -279,7 +294,7 @@ app.get('/updateCargo',messages,function (req, res) {
     });
 });
 
-
+// POST version of update cargo page, first gets variables from the body
 app.post('/updateCargo',function (req, res) 
 {
   var cargoid = req.body.cargoid;
@@ -290,7 +305,7 @@ app.post('/updateCargo',function (req, res)
   var arrival = req.body.arrival;
   console.log(cargotype, departure, arrival, arrival)
 
-  
+// sends the user entered variables to the cargo PUT API  
   axios.put('http://127.0.0.1:5000/api/cargo', {
       secondary_id: cargoid,
       weight: weight,
@@ -301,6 +316,7 @@ app.post('/updateCargo',function (req, res)
     })
     .then(function (response) {
       console.log(response);
+      // backend API returns custom error messages if there's a problem, otherwise returns success message for the user
       if (response.data === true) {
         var message = "Cargo successfully updated!";
       }
@@ -313,6 +329,7 @@ app.post('/updateCargo',function (req, res)
       console.log(error);
     });
 
+    // gets all spaceship records to load updateCargo page with a dropdown selection for spaceships
   axios.get('http://127.0.0.1:5000/api/spaceship/all')
     .then(response => {
       let userData = response.data;
@@ -327,6 +344,7 @@ app.get('/removeCargo',function (req, res)
   res.render('pages/removeCargo')
 });
 
+// POST version of /removeCargo that takes the information the user entered and sends it to the cargo DELETE api
 app.post('/removeCargo', function (req, res) 
 {
   var cargoid = req.body.cargoid;
@@ -342,7 +360,7 @@ app.post('/removeCargo', function (req, res)
   .catch(function (error) {
       console.log(error);
   });
-
+// returns success message on submit
   var message = "Cargo successfully deleted!";
   res.locals.message = message;
 

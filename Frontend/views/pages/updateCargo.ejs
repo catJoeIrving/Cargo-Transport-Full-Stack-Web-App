@@ -28,7 +28,7 @@
                 </div>
                 <div class="form-group">
                     <label for="spaceship">Spaceship</label>
-                    <select class="form-control" id="spaceship" name="spaceship" >
+                    <select class="form-control" id="spaceship" name="spaceship" > <!-- Loops through to display each spaceshipp in the DB as a drop down -->
                         <% data.forEach(function(spaceship) { %>
                             <option value="<%= spaceship.secondary_id %>"><%= spaceship.secondary_id %> - Max Weight: <%= spaceship.maxweight %></option>
                         <% }); %>
@@ -36,7 +36,7 @@
                 </div>
                 <button type="submit" class="btn btn-dark">Submit</button>
             </form>
-            <div class="btn-group mb-3 float-right">
+            <div class="btn-group mb-3 float-right"> <!-- CRUD ops nav bar for cargo-->
                 <a href="/addCargo" class="btn btn-dark">Add</a>
                 <a href="/updateCargo" class="btn btn-dark">Update</a>
                 <a href="/removeCargo" class="btn btn-dark">Remove</a>
@@ -45,6 +45,7 @@
         <%- include('../template/footer')-%>
     </div>
 </body>
+<!-- underlines cargo in nav bar-->
 <script>
     window.onload = function () {
         document.getElementById('cargo').classList.add('active');

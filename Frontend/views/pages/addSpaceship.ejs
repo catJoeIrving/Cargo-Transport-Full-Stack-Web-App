@@ -16,7 +16,7 @@
                 </div>
                 <div class="form-group">
                     <label for="Surname">Captain</label>
-                    <select class="form-control" id="captainid" name="captainid" required>
+                    <select class="form-control" id="captainid" name="captainid" required> <!-- Creates a dropdown selection from existing captains -->
                         <% data.forEach(function(captain) { %>
                             <option value="<%= captain.secondary_id %>"><%= captain.secondary_id %> - <%= captain.firstname %> <%= captain.lastname %></option>
                         <% }); %>
@@ -24,7 +24,7 @@
                 </div>
                 <button type="submit" class="btn btn-dark">Submit</button>
             </form>
-            <div class="btn-group mb-3 float-right">
+            <div class="btn-group mb-3 float-right"> <!-- Buttons to nav to other CRUD ops -->
                 <a href="/addSpaceship" class="btn btn-dark">Add</a>
                 <a href="/updateSpaceship" class="btn btn-dark">Update</a>
                 <a href="/removeSpaceship" class="btn btn-dark">Remove</a>
@@ -33,6 +33,7 @@
         <%- include('../template/footer')-%>
     </div>
 </body>
+<!-- Underlines spaceship in nav bar -->
 <script>
     window.onload = function () {
         document.getElementById('spaceship').classList.add('active');

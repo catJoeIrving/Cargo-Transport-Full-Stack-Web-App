@@ -9,7 +9,7 @@
         <div class="container bg-light text-dark">
             
             <table class="table table-striped">
-                <div class="btn-group mb-3 float-right">
+                <div class="btn-group mb-3 float-right"> <!--CRUD ops nav buttons for spaceships-->
                     <a href="/addSpaceship" class="btn btn-dark">Add</a>
                     <a href="/updateSpaceship" class="btn btn-dark">Update</a>
                     <a href="/removeSpaceship" class="btn btn-dark">Remove</a>
@@ -22,7 +22,7 @@
                         <th>Captain ID</th> <!-- Don't worry, it's secondary ID -->
                     </tr>
                 </thead>
-                <tbody>
+                <tbody> <!-- Loops through the records in spaceship and displays each one -->
                     <%data.forEach(function(entry) {%>
                     <tr>
                         <td><%=entry.secondary_id%></td>
