@@ -438,6 +438,8 @@ def new_captain_record():
     lastname = request_data['lastname']
     rank = request_data['rank']
     homeplanet = request_data['homeplanet']
+    print(request_data)
+    print(secondary_id, firstname, lastname, rank, homeplanet)
     # Set up a connection the DB
     myCreds = creds.Creds()
     conn = create_connection(myCreds.conString, myCreds.userName, myCreds.password, myCreds.dbName)
@@ -446,7 +448,7 @@ def new_captain_record():
     execute_read_query(conn, sql)
     conn.commit()
 
-    return jsonify(True) # Success
+    return("Captain added successfully") # Success
 
 @app.route('/api/captain', methods=['PUT'])
 def update_captain_record():
@@ -465,7 +467,7 @@ def update_captain_record():
 
     # if the user wants to update one row in the 'captain' table, he/she will need to input values for all 4 variables (first name, last name, rank, home planet)
     # The row is identified by the id number
-    sqlQuery = "UPDATE captain SET firstname='%s', lastname='%s', `rank` ='%s', homeplanet='%s' WHERE secondary_id =%s " % (newFirstName, newLastName, newRank, newHomePlanet, inputID)
+    sqlQuery = "UPDATE captain SET firstname='%s', lastname='%s', `rank` ='%s', homeplanet='%s' WHERE secondary_id ='%s' " % (newFirstName, newLastName, newRank, newHomePlanet, inputID)
     execute_query(conn, sqlQuery)
     conn.commit()
     

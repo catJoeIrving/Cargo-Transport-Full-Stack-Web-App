@@ -362,7 +362,7 @@ app.get('/captain', function(req, res)
     });
 });
 
-// Adding a captain 
+
 
 app.get('/addCaptain',messages,function (req, res) 
 {
@@ -374,42 +374,41 @@ app.get('/addCaptain',messages,function (req, res)
     });
 });
 
+// Adding a captain 
+
 app.post('/addCaptain',function (req, res) 
 {
-  var captainid = req.body.captainid;
-  var firstname = req.body.firstname;
-  var lastname = req.body.lastname;
-  var rank = req.body.rank;
-  var homeplanet = req.body.homeplanet;
+    var secondary_id = req.body.secondary_id;
+    var firstname = req.body.firstname;
+    var lastname = req.body.lastname;
+    var rank = req.body.rank;
+    var homeplanet = req.body.homeplanet;
 
-  axios.post('http://127.0.0.1:5000/api/captain', {
-      secondary_id: captainid,
-      firsname: firstname,
-      lastname: lastname,
-      rank: rank,
-      homeplanet: homeplanet
-    })
-    .then(function (response) {
-      console.log(response);
-      if (response.data === true) {
-        var message = "New captain on board!";
-      }
-      else {
-        var message = response.data;
-      }
-      res.locals.message = message;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    axios.post('http://127.0.0.1:5000/api/captain', {
+        secondary_id: secondary_id,
+        firstname: firstname,
+        lastname: lastname,
+        rank: rank,
+        homeplanet: homeplanet
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
-  axios.get('http://127.0.0.1:5000/api/captain/all')
-    .then(response => {
-      let userData = response.data;
-      console.log(userData);
-      res.render('pages/addCaptain', { data: userData });
+    var message = "Captain successfully added!";
+    res.locals.message = message;
+
+    axios.get('http://127.0.0.1:5000/api/captain/all')
+      .then(response => {
+        let userData = response.data;
+        console.log(userData);
+        res.render('pages/addCaptain', { data: userData });
     });
 });
+
 
 // Update captain information 
 
@@ -441,17 +440,13 @@ app.post('/updateCaptain',function (req, res) {
     })
     .then(function (response) {
       console.log(response);
-      if (response.data === true) {
-        var message = "Captain information successfully updated!";
-      }
-      else {
-        var message = response.data;
-      }
-      res.locals.message = message;
     })
     .catch(function (error) {
       console.log(error);
     });
+
+    var message = "Captain successfully updated!";
+    res.locals.message = message;
 
   axios.get('http://127.0.0.1:5000/api/captain/all')
     .then(response => {
