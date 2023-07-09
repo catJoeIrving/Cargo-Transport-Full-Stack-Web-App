@@ -1,10 +1,3 @@
-# ============================================
-# Database Information
-# ============================================
-# DB Identifier: cis3368spring
-# DB name: CIS3368SpringDB
-# Username: admin
-# PW: 32Graduating!!
 
 # ============================================
 # Team Members
